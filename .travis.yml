@@ -1,0 +1,18 @@
+sudo: required
+language: csharp
+solution: FridgeCompanionV2Api/FridgeCompanionV2Api.sln
+services:
+  - docker
+matrix:
+  include:
+    - os: linux
+      dist: xenial
+      sudo: required
+      dotnet: 5.0
+      mono: none
+script:
+  - chmod +x ./FridgeCompanionV2Api/FridgeCompanionV2Api/deploy-envs.sh
+  - chmod +x ./FridgeCompanionV2Api/FridgeCompanionV2Api/scripts/build.sh
+  - chmod +x ./FridgeCompanionV2Api/FridgeCompanionV2Api/scripts/deploy.sh
+  - cd FridgeCompanionV2Api && cd FridgeCompanionV2Api && cd scripts && ./build.sh
+  - if [ "$TRAVIS_BRANCH" == "main" ]; then ./deploy.sh; fi
