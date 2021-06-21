@@ -24,6 +24,7 @@ namespace FridgeCompanionV2Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+            services.AddHealthChecks();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,14 +43,15 @@ namespace FridgeCompanionV2Api
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
 
             app.UseAuthorization();
 
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                endpoints.MapHealthChecks("/health");
             });
         }
     }
