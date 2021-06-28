@@ -6,7 +6,7 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
-COPY ["FridgeCompanionV2Api/FridgeCompanionV2Api.csproj", "FridgeCompanionV2Api/"]
+COPY ["FridgeCompanionV2Api.csproj", "FridgeCompanionV2Api/"]
 RUN dotnet restore "FridgeCompanionV2Api/FridgeCompanionV2Api.csproj"
 COPY . .
 WORKDIR "/src/FridgeCompanionV2Api"
