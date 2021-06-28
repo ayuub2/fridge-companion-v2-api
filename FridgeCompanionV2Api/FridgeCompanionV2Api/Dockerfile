@@ -10,6 +10,7 @@ COPY ["FridgeCompanionV2Api.csproj", "FridgeCompanionV2Api/"]
 RUN dotnet restore "FridgeCompanionV2Api/FridgeCompanionV2Api.csproj"
 COPY . .
 WORKDIR "/src/FridgeCompanionV2Api"
+CMD ls
 RUN dotnet build "FridgeCompanionV2Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
