@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,21 @@ namespace FridgeCompanionV2Api
         {
             services.AddRazorPages();
             services.AddHealthChecks();
+            services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.Authority = "https://securetoken.google.com/fridgecompanion-b9d94";
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = "https://securetoken.google.com/fridgecompanion-b9d94",
+                    ValidateAudience = true,
+                    ValidAudience = "fridgecompanion-b9d94",
+                    ValidateLifetime = true
+                };
+            });
+            //HttpContext.User.Identity.IsAuthenticated
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,6 +62,7 @@ namespace FridgeCompanionV2Api
             app.UseStaticFiles();
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
