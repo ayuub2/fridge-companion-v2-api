@@ -1,7 +1,7 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Infrastructure.Identity;
 using FridgeCompanionV2Api.Infrastructure.Persistence;
-using FridgeCompanionV2Api.WebUI;
+using FridgeCompanionV2Api;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -40,7 +40,7 @@ public class Testing
 
         services.AddSingleton(Mock.Of<IWebHostEnvironment>(w =>
             w.EnvironmentName == "Development" &&
-            w.ApplicationName == "FridgeCompanionV2Api.WebUI"));
+            w.ApplicationName == "FridgeCompanionV2Api"));
 
         services.AddLogging();
 

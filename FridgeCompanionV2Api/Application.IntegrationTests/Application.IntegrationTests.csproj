@@ -31,9 +31,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\WebUI\WebUI.csproj" />
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
+    <ProjectReference Include="..\FridgeCompanionV2Api\FridgeCompanionV2Api.csproj" />
   </ItemGroup>
 
 </Project>
