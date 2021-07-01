@@ -1,7 +1,7 @@
-﻿using CleanArchitecture.Domain.Common;
+﻿using FridgeCompanionV2Api.Domain.Common;
 using MediatR;
 
-namespace CleanArchitecture.Application.Common.Models
+namespace FridgeCompanionV2Api.Application.Common.Models
 {
     public class DomainEventNotification<TDomainEvent> : INotification where TDomainEvent : DomainEvent
     {

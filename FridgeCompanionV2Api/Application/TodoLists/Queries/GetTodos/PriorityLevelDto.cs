@@ -1,4 +1,4 @@
-﻿namespace CleanArchitecture.Application.TodoLists.Queries.GetTodos
+﻿namespace FridgeCompanionV2Api.Application.TodoLists.Queries.GetTodos
 {
     public class PriorityLevelDto
     {

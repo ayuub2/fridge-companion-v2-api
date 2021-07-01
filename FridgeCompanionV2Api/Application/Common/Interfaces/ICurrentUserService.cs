@@ -1,4 +1,4 @@
-﻿namespace CleanArchitecture.Application.Common.Interfaces
+﻿namespace FridgeCompanionV2Api.Application.Common.Interfaces
 {
     public interface ICurrentUserService
     {

@@ -1,7 +1,7 @@
-﻿using CleanArchitecture.Domain.Common;
+﻿using FridgeCompanionV2Api.Domain.Common;
 using System.Threading.Tasks;
 
-namespace CleanArchitecture.Application.Common.Interfaces
+namespace FridgeCompanionV2Api.Application.Common.Interfaces
 {
     public interface IDomainEventService
     {

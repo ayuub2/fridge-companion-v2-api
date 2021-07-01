@@ -1,9 +1,9 @@
-﻿using CleanArchitecture.Domain.Entities;
+﻿using FridgeCompanionV2Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CleanArchitecture.Application.Common.Interfaces
+namespace FridgeCompanionV2Api.Application.Common.Interfaces
 {
     public interface IApplicationDbContext
     {

@@ -1,14 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>FridgeCompanionV2Api.Domain</RootNamespace>
+    <AssemblyName>FridgeCompanionV2Api.Domain</AssemblyName>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Folder Include="Entities\" />
-    <Folder Include="Exceptions\" />
-    <Folder Include="Enums\" />
-    <Folder Include="Common\" />
-  </ItemGroup>
 
 </Project>

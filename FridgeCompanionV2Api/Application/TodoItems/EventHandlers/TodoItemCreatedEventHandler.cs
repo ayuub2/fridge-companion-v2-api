@@ -1,11 +1,11 @@
-﻿using CleanArchitecture.Application.Common.Models;
-using CleanArchitecture.Domain.Events;
+﻿using FridgeCompanionV2Api.Application.Common.Models;
+using FridgeCompanionV2Api.Domain.Events;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CleanArchitecture.Application.TodoItems.EventHandlers
+namespace FridgeCompanionV2Api.Application.TodoItems.EventHandlers
 {
     public class TodoItemCreatedEventHandler : INotificationHandler<DomainEventNotification<TodoItemCreatedEvent>>
     {
@@ -20,7 +20,7 @@ namespace CleanArchitecture.Application.TodoItems.EventHandlers
         {
             var domainEvent = notification.DomainEvent;
 
-            _logger.LogInformation("CleanArchitecture Domain Event: {DomainEvent}", domainEvent.GetType().Name);
+            _logger.LogInformation("FridgeCompanionV2Api Domain Event: {DomainEvent}", domainEvent.GetType().Name);
 
             return Task.CompletedTask;
         }

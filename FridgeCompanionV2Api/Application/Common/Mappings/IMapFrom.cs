@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-namespace CleanArchitecture.Application.Common.Mappings
+namespace FridgeCompanionV2Api.Application.Common.Mappings
 {
     public interface IMapFrom<T>
     {   

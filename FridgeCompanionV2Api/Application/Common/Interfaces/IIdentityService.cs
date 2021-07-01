@@ -1,7 +1,7 @@
-﻿using CleanArchitecture.Application.Common.Models;
+﻿using FridgeCompanionV2Api.Application.Common.Models;
 using System.Threading.Tasks;
 
-namespace CleanArchitecture.Application.Common.Interfaces
+namespace FridgeCompanionV2Api.Application.Common.Interfaces
 {
     public interface IIdentityService
     {

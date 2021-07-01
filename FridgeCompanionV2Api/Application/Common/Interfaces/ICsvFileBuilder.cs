@@ -1,7 +1,7 @@
-﻿using CleanArchitecture.Application.TodoLists.Queries.ExportTodos;
+﻿using FridgeCompanionV2Api.Application.TodoLists.Queries.ExportTodos;
 using System.Collections.Generic;
 
-namespace CleanArchitecture.Application.Common.Interfaces
+namespace FridgeCompanionV2Api.Application.Common.Interfaces
 {
     public interface ICsvFileBuilder
     {

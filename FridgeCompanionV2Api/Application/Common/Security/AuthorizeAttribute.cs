@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CleanArchitecture.Application.Common.Security
+namespace FridgeCompanionV2Api.Application.Common.Security
 {
     /// <summary>
     /// Specifies the class this attribute is applied to requires authorization.
