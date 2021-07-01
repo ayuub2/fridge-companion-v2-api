@@ -1,3 +1,10 @@
+using FluentValidation.AspNetCore;
+using FridgeCompanionV2Api.Application;
+using FridgeCompanionV2Api.Application.Common.Interfaces;
+using FridgeCompanionV2Api.Filters;
+using FridgeCompanionV2Api.Infrastructure;
+using FridgeCompanionV2Api.Infrastructure.Persistence;
+using FridgeCompanionV2Api.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -29,11 +36,31 @@ namespace FridgeCompanionV2Api
         {
 
             services.AddControllers();
+            services.AddApplication();
+            services.AddInfrastructure(Configuration);
+
+            services.AddDatabaseDeveloperPageExceptionFilter();
+
+            services.AddSingleton<ICurrentUserService, CurrentUserService>();
+
+            services.AddHttpContextAccessor();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FridgeCompanionV2Api", Version = "v1" });
             });
             services.AddHealthChecks();
+
+            services.AddControllersWithViews(options =>
+                options.Filters.Add<ApiExceptionFilterAttribute>())
+                    .AddFluentValidation();
+
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
