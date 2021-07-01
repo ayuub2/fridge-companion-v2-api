@@ -45,7 +45,9 @@ namespace FridgeCompanionV2Api
             }
             app.UsePathBase(new PathString("/v2"));
             app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FridgeCompanionV2Api v1"));
+            app.UseSwaggerUI(c => {
+                c.SwaggerEndpoint("../swagger/v1/swagger.json", "FridgeCompanionV2Api v1");
+             });
 
             app.UseHttpsRedirection();
 
