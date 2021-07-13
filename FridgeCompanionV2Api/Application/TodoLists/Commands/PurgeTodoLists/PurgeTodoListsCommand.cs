@@ -1,13 +1,10 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
-using FridgeCompanionV2Api.Application.Common.Security;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace FridgeCompanionV2Api.Application.TodoLists.Commands.PurgeTodoLists
 {
-    [Authorize(Roles = "Administrator")]
-    [Authorize(Policy = "CanPurge")]
     public class PurgeTodoListsCommand : IRequest
     {
     }

@@ -1,6 +1,5 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Exceptions;
 using FridgeCompanionV2Api.Application.Common.Interfaces;
-using FridgeCompanionV2Api.Application.Common.Security;
 using MediatR;
 using System;
 using System.Linq;
@@ -22,17 +21,8 @@ namespace FridgeCompanionV2Api.Application.Common.Behaviours
 
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
-            var authorizeAttributes = request.GetType().GetCustomAttributes<AuthorizeAttribute>();
 
-            if (authorizeAttributes.Any())
-            {
-                // Must be authenticated user
-                if (_currentUserService.UserId == null)
-                {
-                    throw new UnauthorizedAccessException();
-                }
-            }
-
+    
             // User is authorized / authorization not required
             return await next();
         }

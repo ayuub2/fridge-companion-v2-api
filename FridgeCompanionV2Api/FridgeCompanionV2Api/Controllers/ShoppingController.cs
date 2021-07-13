@@ -1,6 +1,7 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Application.ShoppingLists.Commands.CreateShoppingList;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace FridgeCompanionV2Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class ShoppingController : ApiControllerBase
@@ -27,7 +29,7 @@ namespace FridgeCompanionV2Api.Controllers
         [HttpPost]
         public async Task<ActionResult<ShoppingListDto>> Create(CreateShoppingListCommand command)
         {
-            command.UserId = _currentUserService.UserId;
+            //command.UserId = _currentUserService.UserId;
             return await Mediator.Send(command);
         }
     }
