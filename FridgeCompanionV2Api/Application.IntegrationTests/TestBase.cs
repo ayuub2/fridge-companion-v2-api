@@ -1,16 +1,16 @@
-﻿using NUnit.Framework;
-using System.Threading.Tasks;
+﻿//using NUnit.Framework;
+//using System.Threading.Tasks;
 
-namespace FridgeCompanionV2Api.Application.IntegrationTests
-{
-    using static Testing;
+//namespace FridgeCompanionV2Api.Application.IntegrationTests
+//{
+//    using static Testing;
 
-    public class TestBase
-    {
-        [SetUp]
-        public async Task TestSetUp()
-        {
-            await ResetState();
-        }
-    }
-}
+//    public class TestBase
+//    {
+//        [SetUp]
+//        public async Task TestSetUp()
+//        {
+//            await ResetState();
+//        }
+//    }
+//}

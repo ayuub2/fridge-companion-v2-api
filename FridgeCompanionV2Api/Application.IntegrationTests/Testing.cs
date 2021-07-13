@@ -1,173 +1,168 @@
-﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
-using FridgeCompanionV2Api.Infrastructure.Identity;
-using FridgeCompanionV2Api.Infrastructure.Persistence;
-using FridgeCompanionV2Api;
-using MediatR;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Moq;
-using NUnit.Framework;
-using Respawn;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿//using FridgeCompanionV2Api.Application.Common.Interfaces;
+//using FridgeCompanionV2Api.Infrastructure.Persistence;
+//using FridgeCompanionV2Api;
+//using MediatR;
+//using Microsoft.AspNetCore.Hosting;
+//using Microsoft.AspNetCore.Identity;
+//using Microsoft.EntityFrameworkCore;
+//using Microsoft.Extensions.Configuration;
+//using Microsoft.Extensions.DependencyInjection;
+//using Moq;
+//using NUnit.Framework;
+//using Respawn;
+//using System;
+//using System.IO;
+//using System.Linq;
+//using System.Threading.Tasks;
 
-[SetUpFixture]
-public class Testing
-{
-    private static IConfigurationRoot _configuration;
-    private static IServiceScopeFactory _scopeFactory;
-    private static Checkpoint _checkpoint;
-    private static string _currentUserId;
+//[SetUpFixture]
+//public class Testing
+//{
+//    private static IConfigurationRoot _configuration;
+//    private static IServiceScopeFactory _scopeFactory;
+//    private static Checkpoint _checkpoint;
+//    private static string _currentUserId;
 
-    [OneTimeSetUp]
-    public void RunBeforeAnyTests()
-    {
-        var builder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", true, true)
-            .AddEnvironmentVariables();
+//    [OneTimeSetUp]
+//    public void RunBeforeAnyTests()
+//    {
+//        var builder = new ConfigurationBuilder()
+//            .SetBasePath(Directory.GetCurrentDirectory())
+//            .AddJsonFile("appsettings.json", true, true)
+//            .AddEnvironmentVariables();
 
-        _configuration = builder.Build();
+//        _configuration = builder.Build();
 
-        var startup = new Startup(_configuration);
+//        var startup = new Startup(_configuration);
 
-        var services = new ServiceCollection();
+//        var services = new ServiceCollection();
 
-        services.AddSingleton(Mock.Of<IWebHostEnvironment>(w =>
-            w.EnvironmentName == "Development" &&
-            w.ApplicationName == "FridgeCompanionV2Api"));
+//        services.AddSingleton(Mock.Of<IWebHostEnvironment>(w =>
+//            w.EnvironmentName == "Development" &&
+//            w.ApplicationName == "FridgeCompanionV2Api"));
 
-        services.AddLogging();
+//        services.AddLogging();
 
-        startup.ConfigureServices(services);
+//        startup.ConfigureServices(services);
 
-        // Replace service registration for ICurrentUserService
-        // Remove existing registration
-        var currentUserServiceDescriptor = services.FirstOrDefault(d =>
-            d.ServiceType == typeof(ICurrentUserService));
+//        // Replace service registration for ICurrentUserService
+//        // Remove existing registration
+//        var currentUserServiceDescriptor = services.FirstOrDefault(d =>
+//            d.ServiceType == typeof(ICurrentUserService));
 
-        services.Remove(currentUserServiceDescriptor);
+//        services.Remove(currentUserServiceDescriptor);
 
-        // Register testing version
-        services.AddTransient(provider =>
-            Mock.Of<ICurrentUserService>(s => s.UserId == _currentUserId));
+//        // Register testing version
+//        services.AddTransient(provider =>
+//            Mock.Of<ICurrentUserService>(s => s.UserId == _currentUserId));
 
-        _scopeFactory = services.BuildServiceProvider().GetService<IServiceScopeFactory>();
+//        _scopeFactory = services.BuildServiceProvider().GetService<IServiceScopeFactory>();
 
-        _checkpoint = new Checkpoint
-        {
-            TablesToIgnore = new[] { "__EFMigrationsHistory" }
-        };
+//        _checkpoint = new Checkpoint
+//        {
+//            TablesToIgnore = new[] { "__EFMigrationsHistory" }
+//        };
 
-        EnsureDatabase();
-    }
+//        EnsureDatabase();
+//    }
 
-    private static void EnsureDatabase()
-    {
-        using var scope = _scopeFactory.CreateScope();
+//    private static void EnsureDatabase()
+//    {
+//        using var scope = _scopeFactory.CreateScope();
 
-        var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
+//        var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
 
-        context.Database.Migrate();
-    }
+//        context.Database.Migrate();
+//    }
 
-    public static async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
-    {
-        using var scope = _scopeFactory.CreateScope();
+//    public static async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
+//    {
+//        using var scope = _scopeFactory.CreateScope();
 
-        var mediator = scope.ServiceProvider.GetService<ISender>();
+//        var mediator = scope.ServiceProvider.GetService<ISender>();
 
-        return await mediator.Send(request);
-    }
+//        return await mediator.Send(request);
+//    }
 
-    public static async Task<string> RunAsDefaultUserAsync()
-    {
-        return await RunAsUserAsync("test@local", "Testing1234!", new string[] { });
-    }
+//    public static async Task<string> RunAsDefaultUserAsync()
+//    {
+//        return await RunAsUserAsync("test@local", "Testing1234!", new string[] { });
+//    }
 
-    public static async Task<string> RunAsAdministratorAsync()
-    {
-        return await RunAsUserAsync("administrator@local", "Administrator1234!", new[] { "Administrator" });
-    }
+//    public static async Task<string> RunAsAdministratorAsync()
+//    {
+//        return await RunAsUserAsync("administrator@local", "Administrator1234!", new[] { "Administrator" });
+//    }
 
-    public static async Task<string> RunAsUserAsync(string userName, string password, string[] roles)
-    {
-        using var scope = _scopeFactory.CreateScope();
+//    //public static async Task<string> RunAsUserAsync(string userName, string password, string[] roles)
+//    //{
+//    //    using var scope = _scopeFactory.CreateScope();
 
-        var userManager = scope.ServiceProvider.GetService<UserManager<ApplicationUser>>();
+//    //    var result = await userManager.CreateAsync(user, password);
 
-        var user = new ApplicationUser { UserName = userName, Email = userName };
+//    //    if (roles.Any())
+//    //    {
+//    //        var roleManager = scope.ServiceProvider.GetService<RoleManager<IdentityRole>>();
 
-        var result = await userManager.CreateAsync(user, password);
+//    //        foreach (var role in roles)
+//    //        {
+//    //            await roleManager.CreateAsync(new IdentityRole(role));
+//    //        }
 
-        if (roles.Any())
-        {
-            var roleManager = scope.ServiceProvider.GetService<RoleManager<IdentityRole>>();
+//    //        await userManager.AddToRolesAsync(user, roles);
+//    //    }
 
-            foreach (var role in roles)
-            {
-                await roleManager.CreateAsync(new IdentityRole(role));
-            }
+//    //    if (result.Succeeded)
+//    //    {
+//    //        _currentUserId = user.Id;
 
-            await userManager.AddToRolesAsync(user, roles);
-        }
+//    //        return _currentUserId;
+//    //    }
 
-        if (result.Succeeded)
-        {
-            _currentUserId = user.Id;
+//    //    var errors = string.Join(Environment.NewLine, result.ToApplicationResult().Errors);
 
-            return _currentUserId;
-        }
+//    //    throw new Exception($"Unable to create {userName}.{Environment.NewLine}{errors}");
+//    //}
 
-        var errors = string.Join(Environment.NewLine, result.ToApplicationResult().Errors);
+//    public static async Task ResetState()
+//    {
+//        await _checkpoint.Reset(_configuration.GetConnectionString("DefaultConnection"));
+//        _currentUserId = null;
+//    }
 
-        throw new Exception($"Unable to create {userName}.{Environment.NewLine}{errors}");
-    }
+//    public static async Task<TEntity> FindAsync<TEntity>(params object[] keyValues)
+//        where TEntity : class
+//    {
+//        using var scope = _scopeFactory.CreateScope();
 
-    public static async Task ResetState()
-    {
-        await _checkpoint.Reset(_configuration.GetConnectionString("DefaultConnection"));
-        _currentUserId = null;
-    }
+//        var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
 
-    public static async Task<TEntity> FindAsync<TEntity>(params object[] keyValues)
-        where TEntity : class
-    {
-        using var scope = _scopeFactory.CreateScope();
+//        return await context.FindAsync<TEntity>(keyValues);
+//    }
 
-        var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
+//    public static async Task AddAsync<TEntity>(TEntity entity)
+//        where TEntity : class
+//    {
+//        using var scope = _scopeFactory.CreateScope();
 
-        return await context.FindAsync<TEntity>(keyValues);
-    }
+//        var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
 
-    public static async Task AddAsync<TEntity>(TEntity entity)
-        where TEntity : class
-    {
-        using var scope = _scopeFactory.CreateScope();
+//        context.Add(entity);
 
-        var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
+//        await context.SaveChangesAsync();
+//    }
 
-        context.Add(entity);
+//    public static async Task<int> CountAsync<TEntity>() where TEntity : class
+//    {
+//        using var scope = _scopeFactory.CreateScope();
 
-        await context.SaveChangesAsync();
-    }
+//        var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
 
-    public static async Task<int> CountAsync<TEntity>() where TEntity : class
-    {
-        using var scope = _scopeFactory.CreateScope();
+//        return await context.Set<TEntity>().CountAsync();
+//    }
 
-        var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
-
-        return await context.Set<TEntity>().CountAsync();
-    }
-
-    [OneTimeTearDown]
-    public void RunAfterAnyTests()
-    {
-    }
-}
+//    [OneTimeTearDown]
+//    public void RunAfterAnyTests()
+//    {
+//    }
+//}

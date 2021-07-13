@@ -1,6 +1,5 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Infrastructure.Files;
-using FridgeCompanionV2Api.Infrastructure.Identity;
 using FridgeCompanionV2Api.Infrastructure.Persistence;
 using FridgeCompanionV2Api.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -22,14 +21,6 @@ namespace FridgeCompanionV2Api.Infrastructure
             
 
             services.AddScoped<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
-
-            services
-                .AddDefaultIdentity<ApplicationUser>()
-                .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
-
-            services.AddIdentityServer()
-                .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
 
             services.AddTransient<IDateTime, DateTimeService>();
             services.AddTransient<ICsvFileBuilder, CsvFileBuilder>();
