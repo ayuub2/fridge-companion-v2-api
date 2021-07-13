@@ -17,7 +17,7 @@ namespace FridgeCompanionV2Api.Application.ShoppingLists.Commands.CreateShopping
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
 
-        public CreateShoppingListCommandHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger logger)
+        public CreateShoppingListCommandHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<CreateShoppingListCommandHandler> logger)
         {
             _applicationDbContext = applicationDbContext ?? throw new ArgumentNullException(nameof(applicationDbContext));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -41,7 +41,7 @@ namespace FridgeCompanionV2Api.Application.ShoppingLists.Commands.CreateShopping
                 });
 
                 await _applicationDbContext.SaveChangesAsync(cancellationToken);
-                return _mapper.Map<ShoppingListDto>(addedEntity);
+                return _mapper.Map<ShoppingListDto>(addedEntity.Entity);
             }
             catch (Exception exc) 
             {
