@@ -12,5 +12,7 @@ namespace FridgeCompanionV2Api.Application.Common.Interfaces
         DbSet<TodoItem> TodoItems { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+        DbSet<ShoppingList> ShoppingLists { get; set; }
+        DbSet<ShoppingListItem> ShoppingListItems { get; set; }
     }
 }
