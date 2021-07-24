@@ -63,7 +63,6 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.CreateShopping
                 throw exc;
             }
 
-            throw new NotImplementedException();
         }
     }
 }
