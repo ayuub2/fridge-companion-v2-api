@@ -13,6 +13,7 @@ namespace FridgeCompanionV2Api.Application.Common.Mappings
         {
             ApplyMappingsFromAssembly(Assembly.GetExecutingAssembly());
             CreateMap<ShoppingList, ShoppingListDto>();
+            CreateMap<ShoppingListItem, ShoppingItemDto>();
 
         }
 

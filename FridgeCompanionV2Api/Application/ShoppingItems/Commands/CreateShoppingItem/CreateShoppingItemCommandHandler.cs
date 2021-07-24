@@ -54,7 +54,7 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.CreateShopping
                     ShoppingListId = shoppingList.Id
                 });
 
-                
+                await _applicationDbContext.SaveChangesAsync(cancellationToken);
                 return _mapper.Map<ShoppingItemDto>(addedItem.Entity);
             }
             catch (Exception exc)

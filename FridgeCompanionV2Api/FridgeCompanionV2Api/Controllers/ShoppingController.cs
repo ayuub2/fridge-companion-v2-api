@@ -27,14 +27,14 @@ namespace FridgeCompanionV2Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        [HttpPost]
+        [HttpPost("CreateList")]
         public async Task<ActionResult<ShoppingListDto>> CreateList(CreateShoppingListCommand command)
         {
             command.UserId = _currentUserService.UserId;
             return await Mediator.Send(command);
         }
 
-        [HttpPost]
+        [HttpPost("CreateItem")]
         public async Task<ActionResult<ShoppingItemDto>> CreateItem(CreateShoppingItemCommand command)
         {
             command.UserId = _currentUserService.UserId;
