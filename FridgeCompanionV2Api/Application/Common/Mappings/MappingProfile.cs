@@ -2,6 +2,7 @@
 using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Domain.Entities;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -14,6 +15,7 @@ namespace FridgeCompanionV2Api.Application.Common.Mappings
             ApplyMappingsFromAssembly(Assembly.GetExecutingAssembly());
             CreateMap<ShoppingList, ShoppingListDto>();
             CreateMap<ShoppingListItem, ShoppingItemDto>();
+            CreateMap<List<ShoppingListItem>, List<ShoppingItemDto>>();
 
         }
 
