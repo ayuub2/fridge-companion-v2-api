@@ -72,9 +72,9 @@ namespace FridgeCompanionV2Api
                 c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
 
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        { jwtSecurityScheme, Array.Empty<string>() }
-    });
+                {
+                    { jwtSecurityScheme, Array.Empty<string>() }
+                });
 
 
             });
