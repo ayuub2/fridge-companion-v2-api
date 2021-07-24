@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.CreateShoppingItem
+namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.UpdateShoppingItem
 {
     public class UpdateShoppingItemCommandHandler : IRequestHandler<UpdateShoppingItemCommand, ShoppingItemDto>
     {

@@ -15,8 +15,6 @@ namespace FridgeCompanionV2Api.Application.Common.Mappings
             ApplyMappingsFromAssembly(Assembly.GetExecutingAssembly());
             CreateMap<ShoppingList, ShoppingListDto>();
             CreateMap<ShoppingListItem, ShoppingItemDto>();
-            CreateMap<List<ShoppingListItem>, List<ShoppingItemDto>>();
-
         }
 
         private void ApplyMappingsFromAssembly(Assembly assembly)
