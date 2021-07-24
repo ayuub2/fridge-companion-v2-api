@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.CreateShoppingItem
+namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.DeleteAllShoppingItems
 {
     public class DeleteAllShoppingItemsCommandValidator : AbstractValidator<DeleteAllShoppingItemsCommand>
     {
