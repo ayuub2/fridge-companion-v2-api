@@ -12,20 +12,20 @@ using System.Threading.Tasks;
 
 namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.CreateShoppingItem
 {
-    public class UpdateShoppingItemCommandHandler : IRequestHandler<UpdateShoppingItemCommand, ShoppingItemDto>
+    public class DeleteShoppingItemCommandHandler : IRequestHandler<DeleteShoppingItemCommand, ShoppingItemDto>
     {
         private readonly IApplicationDbContext _applicationDbContext;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
 
-        public UpdateShoppingItemCommandHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<UpdateShoppingItemCommand> logger)
+        public DeleteShoppingItemCommandHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<DeleteShoppingItemCommand> logger)
         {
             _applicationDbContext = applicationDbContext ?? throw new ArgumentNullException(nameof(applicationDbContext));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<ShoppingItemDto> Handle(UpdateShoppingItemCommand request, CancellationToken cancellationToken)
+        public async Task<ShoppingItemDto> Handle(DeleteShoppingItemCommand request, CancellationToken cancellationToken)
         {
             if (request is null)
             {
@@ -35,12 +35,12 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.CreateShopping
             var item = _applicationDbContext.ShoppingListItems.FirstOrDefault(x => x.Id == request.Id);
             if (item is null) 
             {
-                _logger.LogError($"Unable to update shopping item for user - {request.UserId}");
+                _logger.LogError($"Unable to delete shopping item for user - {request.UserId}");
                 throw new NotFoundException("Shopping Item not found");
             }
 
 
-            item.IsChecked = request.IsChecked;
+            item.IsDeleted = true;
 
             await _applicationDbContext.SaveChangesAsync(cancellationToken);
             return _mapper.Map<ShoppingItemDto>(item);
