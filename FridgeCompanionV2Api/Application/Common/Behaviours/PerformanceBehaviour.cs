@@ -16,7 +16,7 @@ namespace FridgeCompanionV2Api.Application.Common.Behaviours
         public PerformanceBehaviour(
             ILogger<TRequest> logger, 
             ICurrentUserService currentUserService)
-        {
+        {  
             _timer = new Stopwatch();
 
             _logger = logger;
