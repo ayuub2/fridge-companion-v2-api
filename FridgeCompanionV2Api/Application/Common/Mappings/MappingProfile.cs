@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using FridgeCompanionV2Api.Application.Common.Models;
+using FridgeCompanionV2Api.Domain.Entities;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -10,6 +12,9 @@ namespace FridgeCompanionV2Api.Application.Common.Mappings
         public MappingProfile()
         {
             ApplyMappingsFromAssembly(Assembly.GetExecutingAssembly());
+            CreateMap<ShoppingList, ShoppingListDto>();
+            CreateMap<ShoppingListItem, ShoppingItemDto>();
+
         }
 
         private void ApplyMappingsFromAssembly(Assembly assembly)

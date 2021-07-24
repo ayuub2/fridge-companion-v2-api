@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using FridgeCompanionV2Api.Application.Common.Interfaces;
-using FridgeCompanionV2Api.Application.Common.Security;
 using FridgeCompanionV2Api.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

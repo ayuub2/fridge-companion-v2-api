@@ -1,6 +1,5 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Domain.Entities;
-using FridgeCompanionV2Api.Domain.Events;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,10 +28,8 @@ namespace FridgeCompanionV2Api.Application.TodoItems.Commands.CreateTodoItem
             {
                 ListId = request.ListId,
                 Title = request.Title,
-                Done = false
             };
 
-            entity.DomainEvents.Add(new TodoItemCreatedEvent(entity));
 
             _context.TodoItems.Add(entity);
 

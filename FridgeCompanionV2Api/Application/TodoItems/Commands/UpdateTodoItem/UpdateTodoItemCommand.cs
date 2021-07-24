@@ -35,7 +35,6 @@ namespace FridgeCompanionV2Api.Application.TodoItems.Commands.UpdateTodoItem
             }
 
             entity.Title = request.Title;
-            entity.Done = request.Done;
 
             await _context.SaveChangesAsync(cancellationToken);
 
