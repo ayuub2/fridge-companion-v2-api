@@ -54,5 +54,13 @@ namespace FridgeCompanionV2Api.Controllers
             command.UserId = _currentUserService.UserId;
             return await Mediator.Send(command);
         }
+
+
+        [HttpDelete("ItemAll")]
+        public async Task<ActionResult<List<ShoppingItemDto>>> DeleteItemAll(DeleteAllShoppingItemsCommand command)
+        {
+            command.UserId = _currentUserService.UserId;
+            return await Mediator.Send(command);
+        }
     }
 }
