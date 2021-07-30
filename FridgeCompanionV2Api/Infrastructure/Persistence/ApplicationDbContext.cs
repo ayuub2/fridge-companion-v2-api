@@ -17,7 +17,17 @@ namespace FridgeCompanionV2Api.Infrastructure.Persistence
 
         public DbSet<ShoppingList> ShoppingLists { get; set; }
         public DbSet<ShoppingListItem> ShoppingListItems { get; set; }
-       
+        public DbSet<Recipe> Recipes { get; set; }
+        public DbSet<CuisineType> CuisineTypes { get; set; }
+        public DbSet<DietType> DietTypes { get; set; }
+        public DbSet<DishType> DishTypes { get; set; }
+        public DbSet<Ingredient> Ingredients { get; set; }
+        public DbSet<IngredientGroupType> IngredientGroupTypes { get; set; }
+        public DbSet<IngredientLocation> IngredientLocations { get; set; }
+        public DbSet<IngredientMeasurement> ingredientMeasurements { get; set; }
+        public DbSet<MeasurementType> MeasurementTypes { get; set; }
+        public DbSet<RecipeStep> RecipeSteps { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

@@ -10,6 +10,16 @@ namespace FridgeCompanionV2Api.Application.Common.Interfaces
         DbSet<TodoList> TodoLists { get; set; }
 
         DbSet<TodoItem> TodoItems { get; set; }
+        DbSet<Recipe> Recipes { get; set; }
+        public DbSet<CuisineType> CuisineTypes { get; set; }
+        public DbSet<DietType> DietTypes { get; set; }
+        public DbSet<DishType> DishTypes { get; set; }
+        public DbSet<Ingredient> Ingredients { get; set; }
+        public DbSet<IngredientGroupType> IngredientGroupTypes { get; set; }
+        public DbSet<IngredientLocation> IngredientLocations { get; set; }
+        public DbSet<IngredientMeasurement> ingredientMeasurements { get; set; }
+        public DbSet<MeasurementType> MeasurementTypes { get; set; }
+        public DbSet<RecipeStep> RecipeSteps { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
         DbSet<ShoppingList> ShoppingLists { get; set; }
