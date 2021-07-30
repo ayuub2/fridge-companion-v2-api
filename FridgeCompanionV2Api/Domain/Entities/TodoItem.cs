@@ -9,7 +9,7 @@ namespace FridgeCompanionV2Api.Domain.Entities
     {
         public int Id { get; set; }
 
-        public TodoList List { get; set; }
+        public virtual TodoList List { get; set; }
 
         public int ListId { get; set; }
 

@@ -14,15 +14,16 @@ namespace FridgeCompanionV2Api.Domain.Entities
         public decimal Fat { get; set; }
         public decimal Carb { get; set; }
         public decimal Sugar { get; set; }
+        public decimal Fibre { get; set; }
         public int Standard { get; set; }
         public int Calories { get; set; }
         public int AverageExpiryDays { get; set; }
         public bool IsGluten { get; set; }
         public bool IsDeleted { get; set; }
 
-        public  IngredientLocation Location { get; set; }
+        public virtual IngredientLocation Location { get; set; }
 
-        public List<DietType> DietTypes { get; set; }
-        public List<IngredientGroupType> GroupTypes { get; set; }
+        public virtual List<DietType> DietTypes { get; set; }
+        public virtual List<IngredientGroupType> GroupTypes { get; set; }
     }
 }

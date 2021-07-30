@@ -13,6 +13,6 @@ namespace FridgeCompanionV2Api.Domain.Entities
         public bool IsChecked { get; set; }
         public bool IsDeleted { get; set; }
         public Guid ShoppingListId { get; set; }
-        public ShoppingList ShoppingList { get; set; }
+        public virtual ShoppingList ShoppingList { get; set; }
     }
 }

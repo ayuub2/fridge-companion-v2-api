@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace FridgeCompanionV2Api.Domain.Entities
 {
-    public class RecipeStep
+    public class RecipeIngredient
     {
         public int Id { get; set; }
-        public string Step { get; set; }
-        public int SortOrder { get; set; }
         public virtual Recipe Recipe { get; set; }
+        public virtual Ingredient Ingredient { get; set; }
+        public virtual MeasurementType Measurement { get; set; }
+        public decimal Amount { get; set; }
     }
 }

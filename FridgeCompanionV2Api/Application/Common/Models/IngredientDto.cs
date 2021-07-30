@@ -13,6 +13,7 @@ namespace FridgeCompanionV2Api.Application.Common.Models
         public decimal Fat { get; set; }
         public decimal Carb { get; set; }
         public decimal Sugar { get; set; }
+        public decimal Fibre { get; set; }
         public int Standard { get; set; }
         public int Calories { get; set; }
         public int AverageExpiryDays { get; set; }

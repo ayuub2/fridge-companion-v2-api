@@ -19,7 +19,7 @@ namespace FridgeCompanionV2Api.Application.Common.Mappings
             CreateMap<IngredientLocation, IngredientLocationDto>();
             CreateMap<IngredientGroupType, IngredientGroupTypeDto>();
             CreateMap<Ingredient, IngredientDto>();
-            CreateMap<IngredientMeasurement, IngredientMeasurementDto>();
+            CreateMap<RecipeIngredient, RecipeIngredientDto>();
             CreateMap<RecipeStep, RecipeStepDto>();
             CreateMap<DishType, DishTypeDto>();
             CreateMap<DietType, DietTypeDto>();

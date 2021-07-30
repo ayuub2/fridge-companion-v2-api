@@ -17,9 +17,9 @@ namespace FridgeCompanionV2Api.Domain.Entities
         public string Credit { get; set; }
         public bool IsDeleted { get; set; }
         public string AddedBy { get; set; }
-        public List<IngredientMeasurement> Ingredients { get; set; }
-        public List<DishType> DishTypes { get; set; }
-        public List<CuisineType> CuisineTypes { get; set; }
-        public List<RecipeStep> RecipeSteps { get; set; }
+        public virtual List<RecipeIngredient> Ingredients { get; set; }
+        public virtual List<DishType> DishTypes { get; set; }
+        public virtual List<CuisineType> CuisineTypes { get; set; }
+        public virtual List<RecipeStep> RecipeSteps { get; set; }
     }
 }

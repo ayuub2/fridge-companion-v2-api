@@ -8,6 +8,6 @@ namespace FridgeCompanionV2Api.Domain.Entities
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string UserId { get; set; }
-        public IList<ShoppingListItem> Items { get; private set; } = new List<ShoppingListItem>();
+        public virtual IList<ShoppingListItem> Items { get; private set; } = new List<ShoppingListItem>();
     }
 }
