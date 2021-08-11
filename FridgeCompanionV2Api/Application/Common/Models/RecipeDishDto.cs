@@ -3,6 +3,6 @@
     public class RecipeDishDto
     {
         public int Id { get; set; }
-        public DishTypeDto Dish { get; set; }
+        public string Name { get; set; }
     }
 }

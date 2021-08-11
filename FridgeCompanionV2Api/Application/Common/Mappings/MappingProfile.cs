@@ -22,10 +22,18 @@ namespace FridgeCompanionV2Api.Application.Common.Mappings
             CreateMap<CuisineType, CuisineTypeDto>();
             CreateMap<RecipeIngredient, RecipeIngredientDto>();
             CreateMap<RecipeStep, RecipeStepDto>();
-            CreateMap<RecipeCuisine, RecipeCuisineDto>();
-            CreateMap<RecipeDish, RecipeDishDto>();
-            CreateMap<IngredientDiet, IngredientDietDto>();
-            CreateMap<IngredientType, IngredientTypeDto>();
+            CreateMap<RecipeCuisine, RecipeCuisineDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Cuisine.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Cuisine.Name));
+            CreateMap<RecipeDish, RecipeDishDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Dish.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Dish.Name));
+            CreateMap<IngredientDiet, IngredientDietDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Diet.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Diet.Name));
+            CreateMap<IngredientType, IngredientTypeDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.IngredientGroupType.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.IngredientGroupType.Name));
             CreateMap<DishType, DishTypeDto>();
             CreateMap<DietType, DietTypeDto>();
             CreateMap<Recipe, RecipeDto>();

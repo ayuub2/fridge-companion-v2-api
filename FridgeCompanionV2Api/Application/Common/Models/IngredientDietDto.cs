@@ -8,6 +8,6 @@ namespace FridgeCompanionV2Api.Application.Common.Models
     public class IngredientDietDto
     {
         public int Id { get; set; }
-        public DietTypeDto Diet { get; set; }
+        public string Name { get; set; }
     }
 }
