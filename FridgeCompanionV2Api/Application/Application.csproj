@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Recipes\Commands\" />
     <Folder Include="ShoppingLists\Queries\" />
   </ItemGroup>
 
