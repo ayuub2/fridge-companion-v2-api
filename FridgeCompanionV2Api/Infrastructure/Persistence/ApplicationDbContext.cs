@@ -31,6 +31,7 @@ namespace FridgeCompanionV2Api.Infrastructure.Persistence
         public DbSet<RecipeCuisine> RecipeCuisines { get; set; }
         public DbSet<IngredientDiet> IngredientDiets { get; set; }
         public DbSet<IngredientType> IngredientTypes { get; set; }
+        public DbSet<FridgeItem> FridgeItems { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
