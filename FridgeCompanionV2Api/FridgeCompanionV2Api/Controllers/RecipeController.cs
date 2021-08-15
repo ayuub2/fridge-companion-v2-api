@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 namespace FridgeCompanionV2Api.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("[controller]")]
     public class RecipeController : ApiControllerBase
     {
