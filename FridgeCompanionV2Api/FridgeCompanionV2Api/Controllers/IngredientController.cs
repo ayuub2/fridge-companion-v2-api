@@ -1,6 +1,7 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Application.Ingredients.Queries.GetAutoCompleteIngredients;
+using FridgeCompanionV2Api.Application.Ingredients.Queries.GetIngredientsByName;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,13 @@ namespace FridgeCompanionV2Api.Controllers
         {
             var query = new GetAutoCompleteIngredientsQuery();
             query.Query = ingredientName;
+            query.UserId = _currentUserService.UserId;
+            return await Mediator.Send(query);
+        }
+
+        [HttpPost("GetIngredientsByName")]
+        public async Task<ActionResult<List<IngredientDto>>> GetIngredientsByName([FromBody] GetIngredientByNameQuery query)
+        {
             query.UserId = _currentUserService.UserId;
             return await Mediator.Send(query);
         }
