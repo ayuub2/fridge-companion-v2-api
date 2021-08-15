@@ -1,5 +1,6 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
+using FridgeCompanionV2Api.Application.Ingredients.Queries.GetAutoCompleteIngredients;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,15 +13,14 @@ using System.Threading.Tasks;
 namespace FridgeCompanionV2Api.Controllers
 {
     [ApiController]
-    [Authorize]
     [Route("[controller]")]
-    public class RecipeController : ApiControllerBase
+    public class IngredientController : ApiControllerBase
     {
 
-        private readonly ILogger<RecipeController> _logger;
+        private readonly ILogger<IngredientController> _logger;
         private readonly ICurrentUserService _currentUserService;
 
-        public RecipeController(ILogger<RecipeController> logger, ICurrentUserService currentUserService)
+        public IngredientController(ILogger<IngredientController> logger, ICurrentUserService currentUserService)
         {
             _currentUserService = currentUserService ?? throw new ArgumentNullException(nameof(currentUserService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -28,12 +28,13 @@ namespace FridgeCompanionV2Api.Controllers
 
 
 
-        [HttpGet("GetRecipes")]
-        public async Task<ActionResult<List<RecipeDto>>> GetIGetRecipestems()
+        [HttpGet("AutoCompleteIngredient")]
+        public async Task<ActionResult<List<IngredientDto>>> AutoCompleteIngredient(string ingredientName)
         {
-            GetRecipesQuery command = new GetRecipesQuery();
-            command.UserId = _currentUserService.UserId;
-            return await Mediator.Send(command);
+            var query = new GetAutoCompleteIngredientsQuery();
+            query.Query = ingredientName;
+            query.UserId = _currentUserService.UserId;
+            return await Mediator.Send(query);
         }
 
 
