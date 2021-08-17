@@ -10,7 +10,7 @@ namespace FridgeCompanionV2Api.Application.Fridge.Commands.AddIngredientToFridge
     {
         public AddIngredientToFridgeCommandValidator()
         {
-            RuleFor(x => x.Amount).NotEmpty().WithMessage("Amount must be more than 0".);
+            RuleFor(x => x.Amount).NotEmpty().WithMessage("Amount must be more than 0.");
             RuleFor(x => x.ExpirationDate).NotEmpty().WithMessage("Please supply a valid datetime.");
             RuleFor(x => x.IngredientId).NotEmpty().WithMessage("Please supply a valid ingredientId.");
             RuleFor(x => x.MeasurementId).NotEmpty().WithMessage("Please supply a valid measurementId.");

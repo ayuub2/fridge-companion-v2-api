@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FridgeCompanionV2Api.Application.Fridge.Commands.AddIngredientToFridge
 {
-    public class AddIngredientToFridgeCommand : IRequest<IngredientDto>
+    public class AddIngredientToFridgeCommand : IRequest<FridgeItemDto>
     {
         public string UserId { get; set; }
         public int IngredientId { get; set; }

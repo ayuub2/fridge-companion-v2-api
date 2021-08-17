@@ -11,8 +11,13 @@ namespace FridgeCompanionV2Api.Domain.Entities
         public Guid Id { get; set; }
         public int Amount { get; set; }
         public DateTime Expiration { get; set; }
-        public Ingredient Ingredient { get; set; }
+        public int MeasurementId { get; set; }
+        public int IngredientId { get; set; }
+        public int IngredientLocationId { get; set; }
+        public string UserId { get; set; }
+        public virtual Ingredient Ingredient { get; set; }
+
         public virtual MeasurementType Measurement { get; set; }
-        public virtual IngredientLocation Location { get; set; }
+        public virtual IngredientLocation IngredientLocation { get; set; }
     }
 }
