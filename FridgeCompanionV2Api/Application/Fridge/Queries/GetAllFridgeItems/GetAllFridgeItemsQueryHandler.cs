@@ -31,7 +31,7 @@ namespace FridgeCompanionV2Api.Application.Fridge.Queries.GetAllFridgeItems
                 throw new ArgumentNullException(nameof(request));
             }
 
-            var items = _applicationDbContext.FridgeItems.Where(x => x.UserId == request.UserId).ToList();
+            var items = _applicationDbContext.FridgeItems.Where(x => x.UserId == request.UserId && !x.IsDeleted).ToList();
             return _mapper.Map<List<FridgeItemDto>>(items);
         }
     }

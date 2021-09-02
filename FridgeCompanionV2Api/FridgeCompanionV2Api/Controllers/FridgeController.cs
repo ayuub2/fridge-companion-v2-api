@@ -1,6 +1,7 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Application.Fridge.Commands.AddIngredientToFridge;
+using FridgeCompanionV2Api.Application.Fridge.Commands.UpdateFridgeItem;
 using FridgeCompanionV2Api.Application.Fridge.Queries.GetAllFridgeItems;
 using FridgeCompanionV2Api.Application.Ingredients.Queries.GetAutoCompleteIngredients;
 using FridgeCompanionV2Api.Application.Ingredients.Queries.GetIngredientsByName;
@@ -45,6 +46,13 @@ namespace FridgeCompanionV2Api.Controllers
             var query = new GetAllFridgeItemsQuery();
             query.UserId = _currentUserService.UserId;
             return await Mediator.Send(query);
+        }
+
+        [HttpPut()]
+        public async Task<ActionResult<FridgeItemDto>> Update(UpdateFridgeItemCommand command)
+        {
+            command.UserId = _currentUserService.UserId;
+            return await Mediator.Send(command);
         }
 
     }

@@ -46,7 +46,8 @@ namespace FridgeCompanionV2Api.Application.Fridge.Commands.AddIngredientToFridge
                     MeasurementId = request.MeasurementId,
                     Amount = request.Amount,
                     Expiration = request.ExpirationDate,
-                    UserId = request.UserId
+                    UserId = request.UserId,
+                    IsDeleted = false
                 });
 
                 await _applicationDbContext.SaveChangesAsync(cancellationToken);

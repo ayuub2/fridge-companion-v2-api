@@ -15,6 +15,7 @@ namespace FridgeCompanionV2Api.Domain.Entities
         public int IngredientId { get; set; }
         public int IngredientLocationId { get; set; }
         public string UserId { get; set; }
+        public bool IsDeleted { get; set; }
         public virtual Ingredient Ingredient { get; set; }
 
         public virtual MeasurementType Measurement { get; set; }
