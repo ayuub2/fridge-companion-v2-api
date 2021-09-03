@@ -1,5 +1,8 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
+using FridgeCompanionV2Api.Application.Fridge.Commands.AddIngredientToFridge;
+using FridgeCompanionV2Api.Application.Fridge.Commands.UpdateFridgeItem;
+using FridgeCompanionV2Api.Application.Fridge.Queries.GetAllFridgeItems;
 using FridgeCompanionV2Api.Application.Ingredients.Queries.GetAutoCompleteIngredients;
 using FridgeCompanionV2Api.Application.Ingredients.Queries.GetIngredientsByName;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes;
@@ -14,15 +17,14 @@ using System.Threading.Tasks;
 namespace FridgeCompanionV2Api.Controllers
 {
     [ApiController]
-    [Authorize]
     [Route("[controller]")]
-    public class IngredientController : ApiControllerBase
+    public class FridgeController : ApiControllerBase
     {
 
-        private readonly ILogger<IngredientController> _logger;
+        private readonly ILogger<FridgeController> _logger;
         private readonly ICurrentUserService _currentUserService;
 
-        public IngredientController(ILogger<IngredientController> logger, ICurrentUserService currentUserService)
+        public FridgeController(ILogger<FridgeController> logger, ICurrentUserService currentUserService)
         {
             _currentUserService = currentUserService ?? throw new ArgumentNullException(nameof(currentUserService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -30,22 +32,28 @@ namespace FridgeCompanionV2Api.Controllers
 
 
 
-        [HttpGet("AutoCompleteIngredient")]
-        public async Task<ActionResult<List<IngredientDto>>> AutoCompleteIngredient(string ingredientName)
+        [HttpPost()]
+        public async Task<ActionResult<FridgeItemDto>> Create(AddIngredientToFridgeCommand command)
         {
-            var query = new GetAutoCompleteIngredientsQuery();
-            query.Query = ingredientName;
+            command.UserId = _currentUserService.UserId;
+            return await Mediator.Send(command);
+        }
+
+
+        [HttpGet()]
+        public async Task<ActionResult<List<FridgeItemDto>>> Get()
+        {
+            var query = new GetAllFridgeItemsQuery();
             query.UserId = _currentUserService.UserId;
             return await Mediator.Send(query);
         }
 
-        [HttpPost("GetIngredientsByName")]
-        public async Task<ActionResult<List<IngredientDto>>> GetIngredientsByName([FromBody] GetIngredientByNameQuery query)
+        [HttpPut()]
+        public async Task<ActionResult<FridgeItemDto>> Update(UpdateFridgeItemCommand command)
         {
-            query.UserId = _currentUserService.UserId;
-            return await Mediator.Send(query);
+            command.UserId = _currentUserService.UserId;
+            return await Mediator.Send(command);
         }
-
 
     }
 }

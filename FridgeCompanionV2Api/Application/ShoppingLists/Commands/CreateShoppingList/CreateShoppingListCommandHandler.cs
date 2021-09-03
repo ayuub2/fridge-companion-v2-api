@@ -46,7 +46,7 @@ namespace FridgeCompanionV2Api.Application.ShoppingLists.Commands.CreateShopping
             catch (Exception exc) 
             {
                 _logger.LogError($"Unable to add new shopping list for user - {request.UserId}", exc);
-                throw exc;
+                throw;
             }
         }
     }

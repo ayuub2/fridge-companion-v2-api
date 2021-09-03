@@ -24,6 +24,9 @@ namespace FridgeCompanionV2Api.Application.Common.Interfaces
         public DbSet<RecipeCuisine> RecipeCuisines { get; set; }
         public DbSet<IngredientDiet> IngredientDiets { get; set; }
         public DbSet<IngredientType> IngredientTypes { get; set; }
+        public DbSet<FridgeItem> FridgeItems { get; set; }
+        public DbSet<IngredientMeasurement> IngredientMeasurements { get; set; }
+        DbContext Instance { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
         DbSet<ShoppingList> ShoppingLists { get; set; }
