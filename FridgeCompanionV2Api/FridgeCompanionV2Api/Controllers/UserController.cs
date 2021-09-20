@@ -14,13 +14,13 @@ namespace FridgeCompanionV2Api.Controllers
     [ApiController]
     [Authorize]
     [Route("[controller]")]
-    public class RecipeController : ApiControllerBase
+    public class UserController : ApiControllerBase
     {
 
-        private readonly ILogger<RecipeController> _logger;
+        private readonly ILogger<UserController> _logger;
         private readonly ICurrentUserService _currentUserService;
 
-        public RecipeController(ILogger<RecipeController> logger, ICurrentUserService currentUserService)
+        public UserController(ILogger<UserController> logger, ICurrentUserService currentUserService)
         {
             _currentUserService = currentUserService ?? throw new ArgumentNullException(nameof(currentUserService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -28,7 +28,7 @@ namespace FridgeCompanionV2Api.Controllers
 
 
 
-        [HttpGet("GetRecipes")]
+        [HttpPost("Setup")]
         public async Task<ActionResult<List<RecipeDto>>> GetRecipes()
         {
             GetRecipesQuery command = new GetRecipesQuery();
