@@ -1,6 +1,7 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes;
+using FridgeCompanionV2Api.Application.User.Commands.CreateUserProfile;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -29,9 +30,8 @@ namespace FridgeCompanionV2Api.Controllers
 
 
         [HttpPost("Setup")]
-        public async Task<ActionResult<List<RecipeDto>>> GetRecipes()
+        public async Task<UserDto> Setup(CreateUserProfileCommand command)
         {
-            GetRecipesQuery command = new GetRecipesQuery();
             command.UserId = _currentUserService.UserId;
             return await Mediator.Send(command);
         }

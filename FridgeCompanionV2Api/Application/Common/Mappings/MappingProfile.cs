@@ -38,6 +38,10 @@ namespace FridgeCompanionV2Api.Application.Common.Mappings
             CreateMap<DietType, DietTypeDto>();
             CreateMap<Recipe, RecipeDto>();
             CreateMap<FridgeItem, FridgeItemDto>();
+            CreateMap<UserDiets, UserDietsDto>();
+            CreateMap<UserFavouriteRecipes, UserFavouriteRecipesDto>();
+            CreateMap<UserMadeRecipes, UserMadeRecipesDto>();
+            CreateMap<Domain.Entities.User, UserDto>();
 
         }
 

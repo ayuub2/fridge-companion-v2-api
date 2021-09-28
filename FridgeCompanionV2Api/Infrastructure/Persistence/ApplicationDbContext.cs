@@ -35,7 +35,7 @@ namespace FridgeCompanionV2Api.Infrastructure.Persistence
         public DbSet<IngredientMeasurement> IngredientMeasurements { get; set; }
 
         public DbSet<User> Users { get; set; }
-
+        public DbSet<UserDiets> UserDiets { get; set; }
 
         public DbContext Instance => this;
 
