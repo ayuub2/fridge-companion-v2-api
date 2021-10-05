@@ -1,6 +1,7 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes;
+using FridgeCompanionV2Api.Application.User.Commands.AddFavouriteRecipe;
 using FridgeCompanionV2Api.Application.User.Commands.CreateUserProfile;
 using FridgeCompanionV2Api.Application.User.Commands.UpdateUserProfile;
 using FridgeCompanionV2Api.Application.User.Queries.GetUserProfile;
@@ -49,6 +50,13 @@ namespace FridgeCompanionV2Api.Controllers
             var query = new GetUserProfileQuery();
             query.UserId = _currentUserService.UserId;
             return await Mediator.Send(query);
+        }
+
+        [HttpPost("FavouriteRecipes")]
+        public async Task<UserDto> FavouriteRecipes(AddFavouriteRecipeCommand command)
+        {
+            command.UserId = _currentUserService.UserId;
+            return await Mediator.Send(command);
         }
     }
 }
