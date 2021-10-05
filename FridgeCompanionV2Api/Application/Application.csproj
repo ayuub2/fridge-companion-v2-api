@@ -29,7 +29,6 @@
     <Folder Include="Ingredients\Commands\" />
     <Folder Include="Recipes\Commands\" />
     <Folder Include="ShoppingLists\Queries\" />
-    <Folder Include="User\Queries\" />
   </ItemGroup>
 
 </Project>

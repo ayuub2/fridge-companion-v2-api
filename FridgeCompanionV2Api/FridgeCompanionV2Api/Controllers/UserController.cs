@@ -3,6 +3,7 @@ using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes;
 using FridgeCompanionV2Api.Application.User.Commands.CreateUserProfile;
 using FridgeCompanionV2Api.Application.User.Commands.UpdateUserProfile;
+using FridgeCompanionV2Api.Application.User.Queries.GetUserProfile;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -28,18 +29,26 @@ namespace FridgeCompanionV2Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        [HttpPost("Setup")]
-        public async Task<UserDto> Setup(CreateUserProfileCommand command)
+        [HttpPost()]
+        public async Task<UserDto> Create(CreateUserProfileCommand command)
         {
             command.UserId = _currentUserService.UserId;
             return await Mediator.Send(command);
         }
 
-        [HttpPost("UpdateProfile")]
-        public async Task<UserDto> UpdateProfile(UpdateUserProfileCommand command)
+        [HttpPut()]
+        public async Task<UserDto> Update(UpdateUserProfileCommand command)
         {
             command.UserId = _currentUserService.UserId;
             return await Mediator.Send(command);
+        }
+
+        [HttpGet()]
+        public async Task<UserDto> Get() 
+        {
+            var query = new GetUserProfileQuery();
+            query.UserId = _currentUserService.UserId;
+            return await Mediator.Send(query);
         }
     }
 }
