@@ -29,7 +29,7 @@ namespace FridgeCompanionV2Api.Controllers
 
 
         [HttpGet("GetRecipes")]
-        public async Task<ActionResult<List<RecipeDto>>> GetIGetRecipestems()
+        public async Task<ActionResult<List<RecipeDto>>> GetRecipes()
         {
             GetRecipesQuery command = new GetRecipesQuery();
             command.UserId = _currentUserService.UserId;
