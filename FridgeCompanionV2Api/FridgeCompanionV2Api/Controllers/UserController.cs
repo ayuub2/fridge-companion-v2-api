@@ -3,6 +3,7 @@ using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes;
 using FridgeCompanionV2Api.Application.User.Commands.AddFavouriteRecipe;
 using FridgeCompanionV2Api.Application.User.Commands.CreateUserProfile;
+using FridgeCompanionV2Api.Application.User.Commands.DeleteFavouriteRecipe;
 using FridgeCompanionV2Api.Application.User.Commands.UpdateUserProfile;
 using FridgeCompanionV2Api.Application.User.Queries.GetUserProfile;
 using Microsoft.AspNetCore.Authorization;
@@ -54,6 +55,13 @@ namespace FridgeCompanionV2Api.Controllers
 
         [HttpPost("FavouriteRecipes")]
         public async Task<UserDto> FavouriteRecipes(AddFavouriteRecipeCommand command)
+        {
+            command.UserId = _currentUserService.UserId;
+            return await Mediator.Send(command);
+        }
+
+        [HttpDelete("FavouriteRecipes")]
+        public async Task<UserDto> DeleteFavouriteRecipes(DeleteFavouriteRecipeCommand command)
         {
             command.UserId = _currentUserService.UserId;
             return await Mediator.Send(command);
