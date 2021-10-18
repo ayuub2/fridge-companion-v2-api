@@ -11,22 +11,21 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FridgeCompanionV2Api.Application.User.Commands.DeleteFavouriteRecipe
+namespace FridgeCompanionV2Api.Application.User.Commands.DeleteMadeRecipe
 {
-    public class DeleteFavouriteRecipeCommandHandler : IRequestHandler<DeleteFavouriteRecipeCommand, UserDto>
+    public class DeleteMadeRecipeCommandHandler : IRequestHandler<DeleteMadeRecipeCommand, UserDto>
     {
         private readonly IApplicationDbContext _applicationDbContext;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
 
-        public DeleteFavouriteRecipeCommandHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<DeleteFavouriteRecipeCommandHandler> logger)
+        public DeleteMadeRecipeCommandHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<DeleteMadeRecipeCommandHandler> logger)
         {
             _applicationDbContext = applicationDbContext ?? throw new ArgumentNullException(nameof(applicationDbContext));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-
-        public async Task<UserDto> Handle(DeleteFavouriteRecipeCommand request, CancellationToken cancellationToken)
+        public async Task<UserDto> Handle(DeleteMadeRecipeCommand request, CancellationToken cancellationToken)
         {
             if (request is null)
             {
@@ -41,24 +40,25 @@ namespace FridgeCompanionV2Api.Application.User.Commands.DeleteFavouriteRecipe
                 throw new NotFoundException("User not found");
             }
 
-            var favouriteRecipe = user.UserFavouriteRecipes.FirstOrDefault(x => x.RecipeId == request.RecipeId);
+            var userMadeRecipe = user.UserMadeRecipes.FirstOrDefault(x => x.RecipeId == request.RecipeId);
 
-            if (favouriteRecipe is null)
+            if (userMadeRecipe is null)
             {
-                _logger.LogError($"User attempted to delete a favourite recipe that they didnt favourite. {request.UserId} - {request.RecipeId}");
-                throw new NotFoundException("Favourite recipe not found");
+                _logger.LogError($"User attempted to delete a made recipe that they didnt make. {request.UserId} - {request.RecipeId}");
+                throw new NotFoundException("Made recipe not found");
             }
             try
             {
-                var favouriteRecipesSet = _applicationDbContext.Instance.Set<UserFavouriteRecipes>();
-                favouriteRecipesSet.Remove(favouriteRecipe);
+                var userMadeRecipeSet = _applicationDbContext.Instance.Set<UserMadeRecipes>();
+                userMadeRecipeSet.Remove(userMadeRecipe);
                 await _applicationDbContext.SaveChangesAsync(cancellationToken);
-            } catch (Exception exc) 
-            {
-                _logger.LogError($"Unable to delete user favourite recipe {request.UserId} - {request.RecipeId}");
-                throw exc; 
             }
-            
+            catch (Exception exc)
+            {
+                _logger.LogError($"Unable to delete user made recipe {request.UserId} - {request.RecipeId}");
+                throw exc;
+            }
+
 
             return _mapper.Map<UserDto>(user);
         }

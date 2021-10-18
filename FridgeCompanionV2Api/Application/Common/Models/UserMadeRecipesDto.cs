@@ -2,7 +2,6 @@
 {
     public class UserMadeRecipesDto
     {
-        public int Id { get; set; }
-        public RecipeDto Recipe { get; set; }
+        public int RecipeId { get; set; }
     }
 }
