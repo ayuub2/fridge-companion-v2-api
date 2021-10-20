@@ -29,13 +29,12 @@ namespace FridgeCompanionV2Api.Controllers
 
 
         [HttpGet("GetRecipes")]
-        public async Task<ActionResult<List<RecipeDto>>> GetRecipes()
+        public async Task<ActionResult<List<RecipeDto>>> GetRecipes([FromBody]List<int> recipesIdsToExclude)
         {
-            GetRecipesQuery command = new GetRecipesQuery();
-            command.UserId = _currentUserService.UserId;
-            return await Mediator.Send(command);
+            GetRecipesQuery query = new GetRecipesQuery();
+            query.ExcludeRecipes = recipesIdsToExclude;
+            query.UserId = _currentUserService.UserId;
+            return await Mediator.Send(query);
         }
-
-
     }
 }

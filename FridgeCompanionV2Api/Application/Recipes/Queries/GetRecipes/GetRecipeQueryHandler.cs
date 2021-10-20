@@ -63,15 +63,20 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
                 .Include(x => x.RecipeSteps)
                 .Include(x => x.CuisineTypes)
                     .ThenInclude(x => x.Cuisine).AsNoTracking()
-                .Where(x => !x.IsDeleted)
-                .ToList();
+                .Where(x => !x.IsDeleted);
+                
 
-            var recipes = _mapper.Map<List<RecipeDto>>(recipesEntites);
+            foreach (var recipeId in request.ExcludeRecipes)
+            {
+                recipesEntites = recipesEntites.Where(x => x.Id != recipeId);
+            }
+
+            var recipes = _mapper.Map<List<RecipeDto>>(recipesEntites.ToList());
 
             if (isGlutenFree) recipes = recipes.Where(x => x.CuisineTypes.Any(x => x.Name == "Gluten Free")).ToList();
 
 
-            //// we need reicpes where all the ingredients have all the diets specified by the user
+            // we need reicpes where all the ingredients have all the diets specified by the user
             if (userDiets.Any())
             {
                 recipes = recipes.Where(x => x.Ingredients.Select(x => x.Ingredient.DietTypes).All(eid => !userDiets.Select(ud => ud.Id).Except(eid.Select(ing => ing.Id)).Any())).ToList();
@@ -81,15 +86,29 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
             {
                 foreach (var recipe in recipes)
                 {
-                    var numberOfUsedIngredient = recipe.Ingredients.Any(x => items.Any(i => i.IngredientId == x.Ingredient.Id)) ? CalculateNumberOfUsedIngredients(recipe.Ingredients, items) : 0;
+                    var numberOfUsedIngredient = recipe.Ingredients.Where(x => x).Any(x => items.Any(i => i.IngredientId == x.Ingredient.Id)) ? CalculateNumberOfUsedIngredients(recipe.Ingredients, items) : 0;
                     recipe.NumberOfUsedIngredients = numberOfUsedIngredient;
                     recipe.NumberOfIngredients = recipe.Ingredients.Count();
                 }
                 var topTenRecipes = recipes.OrderByDescending(x => x.NumberOfUsedIngredients).Take(10).ToList();
-
+                // Add padding with random recipes that conform to users dietary needs
+                while (topTenRecipes.Count < 10)
+                {
+                    var randomRecipe = GetRandomRecipe(recipes.Except(topTenRecipes).ToList());
+                    topTenRecipes.Add(randomRecipe);
+                }
                 return topTenRecipes;
             }
-            return recipes;
+
+            //TODO: Add exclude
+            return recipes.Take(10).ToList();
+        }
+
+        private RecipeDto GetRandomRecipe(List<RecipeDto> recipes)
+        {
+            var random = new Random();
+            int index = random.Next(recipes.Count);
+            return recipes[index];
         }
 
         private int CalculateNumberOfUsedIngredients(List<RecipeIngredientDto> recipeIngredients, List<FridgeItem> fridgeIngredients)
