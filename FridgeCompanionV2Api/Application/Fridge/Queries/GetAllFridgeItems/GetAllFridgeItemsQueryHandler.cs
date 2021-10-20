@@ -2,6 +2,7 @@
 using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,12 @@ namespace FridgeCompanionV2Api.Application.Fridge.Queries.GetAllFridgeItems
                 throw new ArgumentNullException(nameof(request));
             }
 
-            var items = _applicationDbContext.FridgeItems.Where(x => x.UserId == request.UserId && !x.IsDeleted).ToList();
+            var items = _applicationDbContext.FridgeItems
+                .Include(x => x.IngredientLocation)
+                .Include(x => x.Ingredient)
+                .Include(x => x.Measurement)
+                .Where(x => x.UserId == request.UserId && !x.IsDeleted)
+                .ToList();
             return _mapper.Map<List<FridgeItemDto>>(items);
         }
     }

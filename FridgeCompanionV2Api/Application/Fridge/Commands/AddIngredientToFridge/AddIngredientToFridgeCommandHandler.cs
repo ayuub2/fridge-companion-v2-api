@@ -35,7 +35,7 @@ namespace FridgeCompanionV2Api.Application.Fridge.Commands.AddIngredientToFridge
 
             try
             {
-                if (!_applicationDbContext.IngredientMeasurements.Any(x => x.Ingredient.Id == request.IngredientId && x.Measurement.Id == request.MeasurementId)) 
+                if (!_applicationDbContext.IngredientMeasurements.Include(x => x.Measurement).Any(x => x.Ingredient.Id == request.IngredientId && x.Measurement.Id == request.MeasurementId)) 
                 {
                     throw new Exception();
                 }
