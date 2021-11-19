@@ -64,7 +64,6 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
                 .Include(x => x.CuisineTypes)
                     .ThenInclude(x => x.Cuisine).AsNoTracking()
                 .Where(x => !x.IsDeleted);
-                
 
             foreach (var recipeId in request.ExcludeRecipes)
             {
@@ -86,7 +85,7 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
             {
                 foreach (var recipe in recipes)
                 {
-                    var numberOfUsedIngredient = recipe.Ingredients.Where(x => x).Any(x => items.Any(i => i.IngredientId == x.Ingredient.Id)) ? CalculateNumberOfUsedIngredients(recipe.Ingredients, items) : 0;
+                    var numberOfUsedIngredient = recipe.Ingredients.Any(x => items.Any(i => i.IngredientId == x.Ingredient.Id)) ? CalculateNumberOfUsedIngredients(recipe.Ingredients, items) : 0;
                     recipe.NumberOfUsedIngredients = numberOfUsedIngredient;
                     recipe.NumberOfIngredients = recipe.Ingredients.Count();
                 }
