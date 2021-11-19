@@ -48,26 +48,20 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
                 .AsNoTracking()
                 .Where(x => !x.IsDeleted);
 
-            // TODO: filter out excluded recipes
-            foreach (var recipeId in request.RecipesToExclude)
-            {
-                recipesEntites = recipesEntites.Where(x => x.Id != recipeId);
-            }
+            // Filter out excluded recipes
+            // TODO: Ectract exclude recipes to shared service
+            recipesEntites = ExcludeRecipes(request.RecipesToExclude, recipesEntites);
 
             // Convert to DTO
             var recipes = _mapper.Map<List<RecipeDto>>(recipesEntites.ToList());
 
-            // TODO: filter using recipe name
-            if (!string.IsNullOrEmpty(request.RecipeName))
-            {
-                var results = Process.ExtractAll(new RecipeDto() { Name = request.RecipeName }, recipes, recipe => recipe.Name, cutoff: 60);
-                recipes = results.Select(x => x.Value).ToList();
-            }
+            // Filter using recipe name
+            recipes = FilterUsingRecipeName(request.RecipeName, recipes);
 
-            return recipes;
-
-            // TODO: filter using ingredient groups
-            // TODO: filter using diets
+            // TODO: filter using ingredient groups - not sure double check
+            // Filter using diets
+            // TODO: Extract filter diets to shared service
+            recipes = FilterDiets(request.Diets, recipes);
             // TODO: filter using dishtypes
             // TODO: filter using cuisine types
             // TODO: filter using ingredients
@@ -78,7 +72,38 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
             // TODO: filter sugar
             // TODO: filter fat
             // TODO: filter carbs
+            return recipes;
+        }
 
+        private static List<RecipeDto> FilterDiets(List<int> diets, List<RecipeDto> recipes)
+        {
+            if (diets.Any())
+            {
+                recipes = recipes.Where(x => x.Ingredients.Select(x => x.Ingredient.DietTypes).All(eid => !diets.Except(eid.Select(ing => ing.Id)).Any())).ToList();
+            }
+
+            return recipes;
+        }
+
+        private static IQueryable<Recipe> ExcludeRecipes(List<int> recipesToExclude, IQueryable<Recipe> recipesEntites)
+        {
+            foreach (var recipeId in recipesToExclude)
+            {
+                recipesEntites = recipesEntites.Where(x => x.Id != recipeId);
+            }
+
+            return recipesEntites;
+        }
+
+        private static List<RecipeDto> FilterUsingRecipeName(string recipeName, List<RecipeDto> recipes)
+        {
+            if (!string.IsNullOrEmpty(recipeName))
+            {
+                var results = Process.ExtractAll(new RecipeDto() { Name = recipeName }, recipes, recipe => recipe.Name, cutoff: 60);
+                recipes = results.Select(x => x.Value).ToList();
+            }
+
+            return recipes;
         }
     }
 }
