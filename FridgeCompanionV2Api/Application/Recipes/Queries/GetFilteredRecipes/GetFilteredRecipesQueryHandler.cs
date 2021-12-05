@@ -19,12 +19,14 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
         private readonly IApplicationDbContext _applicationDbContext;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
+        private readonly IRecipeService _recipeService;
 
-        public GetFilteredRecipesQueryHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<GetFilteredRecipesQueryHandler> logger)
+        public GetFilteredRecipesQueryHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<GetFilteredRecipesQueryHandler> logger, IRecipeService recipeService)
         {
             _applicationDbContext = applicationDbContext ?? throw new ArgumentNullException(nameof(applicationDbContext));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _recipeService = recipeService ?? throw new ArgumentNullException(nameof(recipeService));
         }
         public async Task<List<RecipeDto>> Handle(GetFilteredRecipesQuery request, CancellationToken cancellationToken)
         {
@@ -49,22 +51,34 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
                 .Where(x => !x.IsDeleted);
 
             // Filter out excluded recipes
-            // TODO: Ectract exclude recipes to shared service
-            recipesEntites = ExcludeRecipes(request.RecipesToExclude, recipesEntites);
+            recipesEntites = _recipeService.ExcludeRecipes(request.RecipesToExclude, recipesEntites);
 
             // Convert to DTO
             var recipes = _mapper.Map<List<RecipeDto>>(recipesEntites.ToList());
 
             // Filter using recipe name
-            recipes = FilterUsingRecipeName(request.RecipeName, recipes);
+            recipes = _recipeService.FilterUsingRecipeName(request.RecipeName, recipes);
 
-            // TODO: filter using ingredient groups - not sure double check
             // Filter using diets
-            // TODO: Extract filter diets to shared service
-            recipes = FilterDiets(request.Diets, recipes);
-            // TODO: filter using dishtypes
-            // TODO: filter using cuisine types
-            // TODO: filter using ingredients
+            recipes = _recipeService.FilterDiets(request.Diets, recipes);
+
+            // Filter using dish types
+            recipes = _recipeService.FilterDishTypes(request.DishTypes, recipes);
+
+            // Filter using cuisine types
+            recipes = _recipeService.FilterCuisineTypes(request.CuisineTypes, recipes);
+
+            // Filter using ingredients
+            recipes = _recipeService.FilterIngredients(request.Ingredients, recipes);
+
+
+            // Filter using users fridge items
+            // TODO: Test this by adding items to fridge and seeing them comeback.
+            if(request.UseUserIngredients) 
+            {
+                recipes = _recipeService.FilterUsingFridgeItems(_applicationDbContext.FreshFridgeItems(request.UserId).ToList(), recipes);
+            }
+
             // TODO: filter isNutFree
             // TODO: filter isGlutenFree
             // TODO: filter proteins
@@ -72,37 +86,8 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
             // TODO: filter sugar
             // TODO: filter fat
             // TODO: filter carbs
-            return recipes;
-        }
-
-        private static List<RecipeDto> FilterDiets(List<int> diets, List<RecipeDto> recipes)
-        {
-            if (diets.Any())
-            {
-                recipes = recipes.Where(x => x.Ingredients.Select(x => x.Ingredient.DietTypes).All(eid => !diets.Except(eid.Select(ing => ing.Id)).Any())).ToList();
-            }
-
-            return recipes;
-        }
-
-        private static IQueryable<Recipe> ExcludeRecipes(List<int> recipesToExclude, IQueryable<Recipe> recipesEntites)
-        {
-            foreach (var recipeId in recipesToExclude)
-            {
-                recipesEntites = recipesEntites.Where(x => x.Id != recipeId);
-            }
-
-            return recipesEntites;
-        }
-
-        private static List<RecipeDto> FilterUsingRecipeName(string recipeName, List<RecipeDto> recipes)
-        {
-            if (!string.IsNullOrEmpty(recipeName))
-            {
-                var results = Process.ExtractAll(new RecipeDto() { Name = recipeName }, recipes, recipe => recipe.Name, cutoff: 60);
-                recipes = results.Select(x => x.Value).ToList();
-            }
-
+            // TODO: calculate number of missing ingredients and sort based on that. Take top 10 and dont pad. Enure ingredients are calculated by either user provided ingredients
+            // or items already in the fridge
             return recipes;
         }
     }

@@ -18,12 +18,14 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
         private readonly IApplicationDbContext _applicationDbContext;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
+        private readonly IRecipeService _recipeService;
 
-        public GetRecipeQueryHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<GetRecipesQuery> logger)
+        public GetRecipeQueryHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<GetRecipesQuery> logger, IRecipeService recipeService)
         {
             _applicationDbContext = applicationDbContext ?? throw new ArgumentNullException(nameof(applicationDbContext));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _recipeService = recipeService ?? throw new ArgumentNullException(nameof(recipeService));
         }
 
         public async Task<List<RecipeDto>> Handle(GetRecipesQuery request, CancellationToken cancellationToken)
@@ -49,9 +51,9 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
                 userDiets = user.UserDiets.Select(x => x.DietType).ToList();
             }
 
-            var items = _applicationDbContext.FridgeItems.Where(x => x.UserId == request.UserId && !x.IsDeleted && DateTime.Now < x.Expiration).ToList();
+            var items = _applicationDbContext.FreshFridgeItems(request.UserId).ToList();
 
-            var recipesEntites = _applicationDbContext.Recipes
+            var recipeEntites = _applicationDbContext.Recipes
                 .Include(x => x.Ingredients)
                     .ThenInclude(x => x.Ingredient)
                         .ThenInclude(x => x.Location)
@@ -65,12 +67,10 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
                     .ThenInclude(x => x.Cuisine).AsNoTracking()
                 .Where(x => !x.IsDeleted);
 
-            foreach (var recipeId in request.ExcludeRecipes)
-            {
-                recipesEntites = recipesEntites.Where(x => x.Id != recipeId);
-            }
+            
+            recipeEntites = _recipeService.ExcludeRecipes(request.ExcludeRecipes, recipeEntites);
 
-            var recipes = _mapper.Map<List<RecipeDto>>(recipesEntites.ToList());
+            var recipes = _mapper.Map<List<RecipeDto>>(recipeEntites.ToList());
 
             if (isGlutenFree) recipes = recipes.Where(x => x.CuisineTypes.Any(x => x.Name == "Gluten Free")).ToList();
 
@@ -78,7 +78,7 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
             // we need reicpes where all the ingredients have all the diets specified by the user
             if (userDiets.Any())
             {
-                recipes = recipes.Where(x => x.Ingredients.Select(x => x.Ingredient.DietTypes).All(eid => !userDiets.Select(ud => ud.Id).Except(eid.Select(ing => ing.Id)).Any())).ToList();
+                recipes = _recipeService.FilterDiets(userDiets.Select(x => x.Id).ToList(), recipes);     
             }
 
             if (items.Any())

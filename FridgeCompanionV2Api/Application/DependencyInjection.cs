@@ -4,6 +4,8 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using FridgeCompanionV2Api.Application.Common.CommonServices;
+using FridgeCompanionV2Api.Application.Common.Interfaces;
 
 namespace FridgeCompanionV2Api.Application
 {
@@ -17,6 +19,7 @@ namespace FridgeCompanionV2Api.Application
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
+            services.AddScoped<IRecipeService, RecipeService>();
 
             return services;
         }

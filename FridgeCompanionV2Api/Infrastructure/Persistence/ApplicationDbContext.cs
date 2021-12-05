@@ -1,6 +1,8 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
 using System.Reflection;
 
 namespace FridgeCompanionV2Api.Infrastructure.Persistence
@@ -39,6 +41,10 @@ namespace FridgeCompanionV2Api.Infrastructure.Persistence
 
         public DbContext Instance => this;
 
+        public IQueryable<FridgeItem> FreshFridgeItems(string userId)
+        {
+            return FridgeItems.Where(x => x.UserId == userId && !x.IsDeleted && DateTime.Now < x.Expiration);
+        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
