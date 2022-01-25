@@ -34,6 +34,8 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
             // check if they have user profile otherwise ignore preferences
             // check their fridge contents and compare them with recipe ingredients
 
+            // TODO: Implement isNutFree
+
             if (request is null)
             {
                 throw new ArgumentNullException(nameof(request));
@@ -72,7 +74,7 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
 
             var recipes = _mapper.Map<List<RecipeDto>>(recipeEntites.ToList());
 
-            if (isGlutenFree) recipes = recipes.Where(x => x.CuisineTypes.Any(x => x.Name == "Gluten Free")).ToList();
+            if (isGlutenFree) recipes = _recipeService.FilterGlutenRecipes(recipes);
 
 
             // we need reicpes where all the ingredients have all the diets specified by the user
@@ -87,7 +89,6 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
                 {
                     var numberOfUsedIngredient = recipe.Ingredients.Any(x => items.Any(i => i.IngredientId == x.Ingredient.Id)) ? CalculateNumberOfUsedIngredients(recipe.Ingredients, items) : 0;
                     recipe.NumberOfUsedIngredients = numberOfUsedIngredient;
-                    recipe.NumberOfIngredients = recipe.Ingredients.Count();
                 }
                 var topTenRecipes = recipes.OrderByDescending(x => x.NumberOfUsedIngredients).Take(10).ToList();
                 // Add padding with random recipes that conform to users dietary needs
@@ -131,15 +132,15 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
                         // we then check if the user has more in the fridge
                         var recipeIngredientConverter = _applicationDbContext.IngredientMeasurements.FirstOrDefault(x => x.IngredientId == recipeIngredient.Ingredient.Id && x.MeasurementId == recipeIngredient.Measurement.Id);
                         var fridgeIngredientConverter = _applicationDbContext.IngredientMeasurements.FirstOrDefault(x => x.IngredientId == fridgeIngredient.IngredientId && x.MeasurementId == fridgeIngredient.MeasurementId);
-                        var recipeIngredientAmountGrams = 0;
-                        var fridgeIngredientAmountGrams = 0;
-                        if (recipeIngredientConverter is not null)
+                        decimal recipeIngredientAmountGrams = 0;
+                        decimal fridgeIngredientAmountGrams = 0;
+                        if (recipeIngredientConverter.AverageGrams is not null)
                         {
-                            recipeIngredientAmountGrams = (int)(recipeIngredientConverter.AverageGrams * recipeIngredient.Amount);
+                            recipeIngredientAmountGrams = recipeIngredientConverter.AverageGrams.Value * Convert.ToDecimal(recipeIngredient.Amount);
                         }
                         else if (recipeIngredient.Measurement.Name == "Grams")
                         {
-                            recipeIngredientAmountGrams = (int)recipeIngredient.Amount;
+                            recipeIngredientAmountGrams = recipeIngredient.Amount;
                         }
                         else
                         {
@@ -147,13 +148,13 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
                             throw new Exception($"Unable to convert measurement to grams - {recipeIngredient.Measurement.Id}");
                         }
 
-                        if (fridgeIngredientConverter is not null)
+                        if (fridgeIngredientConverter.AverageGrams is not null)
                         {
-                            fridgeIngredientAmountGrams = (int)(fridgeIngredientConverter.AverageGrams * fridgeIngredient.Amount);
+                            fridgeIngredientAmountGrams = fridgeIngredientConverter.AverageGrams.Value * Convert.ToDecimal(fridgeIngredient.Amount);
                         }
                         else if (fridgeIngredient.Measurement.Name == "Grams")
                         {
-                            fridgeIngredientAmountGrams = (int)fridgeIngredient.Amount;
+                            fridgeIngredientAmountGrams = fridgeIngredient.Amount;
                         }
                         else
                         {

@@ -1,5 +1,6 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
+using FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes;
 using FridgeCompanionV2Api.Domain.Entities;
 using FuzzySharp;
 using System;
@@ -64,7 +65,7 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
         {
             if (ingredients.Any()) 
             {
-                recipes = recipes.Where(x => x.Ingredients.Any(ing => ingredients.Contains(ing.Id))).ToList();
+                recipes = recipes.Where(x => x.Ingredients.Any(ing => ingredients.Contains(ing.Ingredient.Id))).ToList();
             }
             return recipes;
         }
@@ -74,9 +75,33 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
             if (fridgeItems.Any())
             {
                 var fridgeItemIngredientIds = fridgeItems.Select(x => x.IngredientId).ToList();
-                recipes = recipes.Where(x => x.Ingredients.Any(ing => fridgeItemIngredientIds.Contains(ing.Id))).ToList();
+                recipes = recipes.Where(x => x.Ingredients.Any(ing => fridgeItemIngredientIds.Contains(ing.Ingredient.Id))).ToList();
+
             }
             return recipes;
         }
+
+        public List<RecipeDto> OrderRecipesByIngredients(List<int> ingredientIds, List<RecipeDto> recipes) 
+        {
+            foreach (var recipe in recipes)
+            {
+                var count = 0;
+                foreach (var ingredient in recipe.Ingredients)
+                {
+                    if (ingredientIds.Contains(ingredient.Ingredient.Id))
+                        count++;
+                }
+                recipe.NumberOfUsedIngredients = count;
+            }
+
+            return recipes.OrderByDescending(x => (x.NumberOfUsedIngredients * 100) / x.NumberOfIngredients).ToList();
+        }
+
+        public List<RecipeDto> FilterGlutenRecipes(List<RecipeDto> recipes) 
+        {
+            return recipes.Where(x => x.CuisineTypes.Any(x => x.Name == "Gluten Free")).ToList();
+        }
+
+        
     }
 }
