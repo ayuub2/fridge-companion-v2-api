@@ -55,21 +55,10 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
 
             var items = _applicationDbContext.FreshFridgeItems(request.UserId).ToList();
 
-            var recipeEntites = _applicationDbContext.Recipes
-                .Include(x => x.Ingredients)
-                    .ThenInclude(x => x.Ingredient)
-                        .ThenInclude(x => x.Location)
-                .Include(x => x.Ingredients).ThenInclude(x => x.Measurement)
-                .Include(x => x.Ingredients).ThenInclude(i => i.Ingredient).ThenInclude(id => id.GroupTypes).ThenInclude(idt => idt.IngredientGroupType)
-                .Include(x => x.Ingredients).ThenInclude(i => i.Ingredient).ThenInclude(id => id.DietTypes).ThenInclude(idt => idt.Diet)
-                .Include(x => x.DishTypes)
-                    .ThenInclude(x => x.Dish)
-                .Include(x => x.RecipeSteps)
-                .Include(x => x.CuisineTypes)
-                    .ThenInclude(x => x.Cuisine).AsNoTracking()
-                .Where(x => !x.IsDeleted);
+            var recipeEntites = _applicationDbContext.GetRecipesWithDetails();
 
-            
+
+
             recipeEntites = _recipeService.ExcludeRecipes(request.ExcludeRecipes, recipeEntites);
 
             var recipes = _mapper.Map<List<RecipeDto>>(recipeEntites.ToList());
@@ -144,7 +133,7 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
                         }
                         else
                         {
-                            _logger.LogError("Unable to convert");
+                            _logger.LogError($"Unable to convert measurement to grams - {recipeIngredient.Measurement.Id}");
                             throw new Exception($"Unable to convert measurement to grams - {recipeIngredient.Measurement.Id}");
                         }
 
@@ -158,7 +147,7 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
                         }
                         else
                         {
-                            _logger.LogError("Unable to convert");
+                            _logger.LogError($"Unable to convert measurement to grams - {fridgeIngredient.MeasurementId}");
                             throw new Exception($"Unable to convert measurement to grams - {fridgeIngredient.MeasurementId}");
                         }
 

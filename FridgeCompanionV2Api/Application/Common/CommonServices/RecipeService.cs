@@ -102,6 +102,9 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
             return recipes.Where(x => x.CuisineTypes.Any(x => x.Name == "Gluten Free")).ToList();
         }
 
-        
+        public List<RecipeDto> RemoveRecipesContainingNuts(List<RecipeDto> recipes)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

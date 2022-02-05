@@ -76,7 +76,7 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
             recipes = _recipeService.FilterIngredients(request.Ingredients, recipes);
 
             // TODO: filter isNutFree, do we need to make sure we always check the users profile? Also make sure you do normal recipe isNutFree, its not implemented
-            if(request.IsNutFree || user.IsAllergicNuts)
+            if(request.IsNutFree)
                 recipes = _recipeService.RemoveRecipesContainingNuts(recipes);
 
 
