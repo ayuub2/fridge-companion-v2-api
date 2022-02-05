@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FridgeCompanionV2Api.Application.Common.Exceptions;
 using FridgeCompanionV2Api.Application.Common.Interfaces;
+using FridgeCompanionV2Api.Domain.Entities;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -24,9 +25,6 @@ namespace FridgeCompanionV2Api.Application.User.Commands.RemoveRecipeIngredients
         }
         async Task<Unit> IRequestHandler<RemoveRecipeIngredientsFromFridgeCommand, Unit>.Handle(RemoveRecipeIngredientsFromFridgeCommand request, CancellationToken cancellationToken)
         {
-            // TODO: When measurments are different convert to grams, if recipe ingredient is moer than user ingredient remove it
-            // however if not make the subtraction in grams, then convert grams back into users preferred measurement and set that amount
-            // TODO: Incorporate servings by dividing the recipe ingredients by the serving amount
             if (request is null)
             {
                 throw new ArgumentNullException(nameof(request));
@@ -41,72 +39,32 @@ namespace FridgeCompanionV2Api.Application.User.Commands.RemoveRecipeIngredients
                     foreach (var recipeIngredient in recipe.Ingredients)
                     {
                         var ingredient = recipeIngredient.Ingredient;
+                        var recipeAmount = recipeIngredient.Amount * request.Servings;
                         var userIngredient = freshFridgeItems.FirstOrDefault(x => x.IngredientId == ingredient.Id);
                         if (userIngredient is not null) 
                         {
                             // If measurements of both user ingredient and recipe ingredient the same we can subtract them easily
                             if (recipeIngredient.MeasurementId == userIngredient.MeasurementId)
                             {
-                                if (userIngredient.Amount > recipeIngredient.Amount)
-                                {
-                                    userIngredient.Amount = userIngredient.Amount - recipeIngredient.Amount;
-                                }
-                                else
-                                {
-                                    userIngredient.IsDeleted = true;
-                                }
+                                RemoveIngredientFromAmount(userIngredient, userIngredient.Amount, recipeAmount);
                             }
                             else 
                             {
                                 // if not we must convert both user and recipe ignredients to grams
                                 var recipeIngredientConverter = _applicationDbContext.IngredientMeasurements.FirstOrDefault(x => x.IngredientId == recipeIngredient.Ingredient.Id && x.MeasurementId == recipeIngredient.Measurement.Id);
                                 var fridgeIngredientConverter = _applicationDbContext.IngredientMeasurements.FirstOrDefault(x => x.IngredientId == userIngredient.IngredientId && x.MeasurementId == userIngredient.MeasurementId);
-                                decimal recipeIngredientAmountGrams = 0;
-                                decimal fridgeIngredientAmountGrams = 0;
-                                if (recipeIngredientConverter.AverageGrams is not null)
-                                {
-                                    recipeIngredientAmountGrams = recipeIngredientConverter.AverageGrams.Value * recipeIngredient.Amount;
-                                }
-                                else if (recipeIngredient.Measurement.Name == "Grams")
-                                {
-                                    recipeIngredientAmountGrams = recipeIngredient.Amount;
-                                }
-                                else
-                                {
-                                    _logger.LogError($"Unable to convert measurement to grams - {recipeIngredient.Measurement.Id}");
-                                    throw new Exception($"Unable to convert measurement to grams - {recipeIngredient.Measurement.Id}");
-                                }
-
-
-                                if (fridgeIngredientConverter.AverageGrams is not null)
-                                {
-                                    fridgeIngredientAmountGrams = fridgeIngredientConverter.AverageGrams.Value * userIngredient.Amount;
-                                }
-                                else if (userIngredient.Measurement.Name == "Grams")
-                                {
-                                    fridgeIngredientAmountGrams = userIngredient.Amount;
-                                }
-                                else
-                                {
-                                    _logger.LogError($"Unable to convert measurement to grams - {userIngredient.MeasurementId}");
-                                    throw new Exception($"Unable to convert measurement to grams - {userIngredient.MeasurementId}");
-                                }
+                                decimal fridgeIngredientAmountGrams = ConvertMeasurementToGrams(fridgeIngredientConverter, userIngredient.Amount, userIngredient.Measurement);
+                                decimal recipeIngredientAmountGrams = ConvertMeasurementToGrams(recipeIngredientConverter, recipeAmount, recipeIngredient.Measurement);
 
                                 // if the users ingredients measurement type is 
                                 if (userIngredient.Measurement.Name == "Grams")
                                 {
-                                    if (userIngredient.Amount > recipeIngredient.Amount)
-                                    {
-                                        userIngredient.Amount = userIngredient.Amount - recipeIngredient.Amount;
-                                    }
-                                    else
-                                    {
-                                        userIngredient.IsDeleted = true;
-                                    }
+                                    RemoveIngredientFromAmount(userIngredient, userIngredient.Amount, recipeAmount);
                                 }
                                 else if (userIngredient.Measurement.Name != "Grams")
                                 {
                                     var remainingGrams = fridgeIngredientAmountGrams - recipeIngredientAmountGrams;
+
                                     if (remainingGrams > 0)
                                     {
                                         var amountInFridgeMeasurement = remainingGrams / fridgeIngredientConverter.AverageGrams.Value;
@@ -130,6 +88,37 @@ namespace FridgeCompanionV2Api.Application.User.Commands.RemoveRecipeIngredients
                 }
             }
             return new Unit();
+        }
+
+        private void RemoveIngredientFromAmount(FridgeItem fridgeItem, decimal fridgeAmount, decimal recipeAmount)
+        {
+            if (fridgeAmount > recipeAmount)
+            {
+                fridgeItem.Amount = fridgeAmount - recipeAmount;
+            }
+            else
+            {
+                fridgeItem.IsDeleted = true;
+            }
+        }
+
+        private decimal ConvertMeasurementToGrams(IngredientMeasurement ingredientMeasurement, decimal amount, MeasurementType measurement) 
+        {
+            decimal grams;
+            if (ingredientMeasurement.AverageGrams is not null)
+            {
+                grams = ingredientMeasurement.AverageGrams.Value * amount;
+            }
+            else if (measurement.Name == "Grams")
+            {
+                grams = amount;
+            }
+            else
+            {
+                _logger.LogError($"Unable to convert measurement to grams - {measurement.Id}");
+                throw new Exception($"Unable to convert measurement to grams - {measurement.Id}");
+            }
+            return grams;
         }
     }
 }
