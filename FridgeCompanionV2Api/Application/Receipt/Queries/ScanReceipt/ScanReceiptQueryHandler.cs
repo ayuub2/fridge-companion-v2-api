@@ -7,11 +7,13 @@ using Amazon.Textract.Model;
 using AutoMapper;
 using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
+using FridgeCompanionV2Api.Application.Common.Options;
 using FridgeCompanionV2Api.Domain.Entities;
 using FuzzySharp;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,12 +28,14 @@ namespace FridgeCompanionV2Api.Application.Receipt.Queries.ScanReceipt
         private readonly IApplicationDbContext _applicationDbContext;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
+        private readonly IOptions<AwsOptions> _awsOptions;
 
-        public ScanReceiptQueryHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<ScanReceiptQueryHandler> logger)
+        public ScanReceiptQueryHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<ScanReceiptQueryHandler> logger, IOptions<AwsOptions> awsOptions)
         {
             _applicationDbContext = applicationDbContext ?? throw new ArgumentNullException(nameof(applicationDbContext));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _awsOptions = awsOptions ?? throw new ArgumentNullException(nameof(awsOptions));
         }
 
         public async Task<ScanReceiptDto> Handle(ScanReceiptQuery request, CancellationToken cancellationToken)
@@ -49,17 +53,17 @@ namespace FridgeCompanionV2Api.Application.Receipt.Queries.ScanReceipt
                     .ThenInclude(idt => idt.IngredientGroupType)
                 .Where(x => !x.IsDeleted).AsNoTracking().ToList();
 
-            var credentials = new BasicAWSCredentials("AKIAWXS7DMIJHLN33BOS", "dj0lJ5xdPkS2weGJ39/zi4ncqBlZBFATV5mbpncH");
+            var credentials = new BasicAWSCredentials(_awsOptions.Value.AccessKey, _awsOptions.Value.SecretKey);
             var config = new AmazonS3Config
             {
-                RegionEndpoint = Amazon.RegionEndpoint.EUWest1
+                RegionEndpoint = RegionEndpoint.EUWest1
             };
             using var client = new AmazonS3Client(credentials, config);
             await using var newMemoryStream = new MemoryStream();
             request.Image.CopyTo(newMemoryStream);
 
             var fileName = Guid.NewGuid().ToString();
-            var bucketName = "user-uploaded-receipt";
+            var bucketName = _awsOptions.Value.BucketName;
             var uploadRequest = new TransferUtilityUploadRequest
             {
                 InputStream = newMemoryStream,

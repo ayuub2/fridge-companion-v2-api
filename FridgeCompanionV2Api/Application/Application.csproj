@@ -30,6 +30,7 @@
   <ItemGroup>
     <Folder Include="Ingredients\Commands\" />
     <Folder Include="Receipt\Commands\" />
+    <Folder Include="Receipt\Queries\ScanBarcode\" />
     <Folder Include="Recipes\Commands\" />
     <Folder Include="ShoppingLists\Queries\" />
   </ItemGroup>
