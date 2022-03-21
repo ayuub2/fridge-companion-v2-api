@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FridgeCompanionV2Api.Application.Receipt.Queries.ScanBarcode;
 
 namespace FridgeCompanionV2Api.Controllers
 {
@@ -40,6 +41,13 @@ namespace FridgeCompanionV2Api.Controllers
         public async Task<ScanReceiptDto> ScanReceipt([FromForm] IFormFile file)
         {
             var query = new ScanReceiptQuery() { Image = file };
+            query.UserId = _currentUserService.UserId;
+            return await Mediator.Send(query);
+        }
+
+        [HttpPost("ScanBarcode")]
+        public async Task<ScanBarcodeDto> ScanBarcode(ScanBarcodeQuery query)
+        {
             query.UserId = _currentUserService.UserId;
             return await Mediator.Send(query);
         }
