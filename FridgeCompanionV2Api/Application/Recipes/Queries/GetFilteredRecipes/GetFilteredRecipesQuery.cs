@@ -10,7 +10,6 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
     public class GetFilteredRecipesQuery : IRequest<List<RecipeDto>>
     {
         public string UserId { get; set; }
-        public List<int> IngredientGroups { get; set; } = new List<int>();
         public List<int> RecipesToExclude { get; set; } = new List<int>();
         public List<int> Diets { get; set; } = new List<int>();
         public List<int> DishTypes { get; set; } = new List<int>();

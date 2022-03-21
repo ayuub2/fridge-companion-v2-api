@@ -3,6 +3,7 @@ using FridgeCompanionV2Api.Application.Common.Exceptions;
 using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ namespace FridgeCompanionV2Api.Application.User.Queries.GetUserProfile
                 throw new ArgumentNullException(nameof(request));
             }
 
-            var user = _applicationDbContext.Users.FirstOrDefault(x => x.Id == request.UserId);
+            var user = _applicationDbContext.Users.Include(x => x.UserFavouriteRecipes).Include(x => x.UserMadeRecipes).Include(x => x.UserDiets).FirstOrDefault(x => x.Id == request.UserId);
             if(user is null) 
             {
                 _logger.LogError($"Attempted to get user profile for non existent user - {request.UserId}");

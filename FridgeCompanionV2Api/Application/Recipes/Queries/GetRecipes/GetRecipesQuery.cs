@@ -10,6 +10,6 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
     public class GetRecipesQuery : IRequest<List<RecipeDto>>
     {
         public string UserId { get; set; }
-        public List<int> ExcludeRecipes { get; set; }
+        public List<int> ExcludeRecipes { get; set; } = new List<int>();
     }
 }

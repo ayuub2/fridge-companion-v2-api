@@ -132,8 +132,6 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
                 recipes = _recipeService.OrderRecipesByIngredients(freshFridgeItems.Select(x => x.IngredientId).ToList(), recipes);
             }
 
-            //TODO: Test above
-
 
             return recipes.Take(10).ToList();
         }
