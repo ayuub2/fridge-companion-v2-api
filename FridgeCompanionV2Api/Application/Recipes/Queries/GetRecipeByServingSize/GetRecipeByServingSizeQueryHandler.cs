@@ -38,8 +38,8 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipeByServingSiz
             if (recipe is null) throw new NotFoundException("Recipe not found.");
 
             var recipeInServingSize = _recipeService.GetRecipeInServingSize(request.ServingSize, _mapper.Map<RecipeDto>(recipe), _applicationDbContext, _mapper);
-
-            return recipeInServingSize;
+            return _recipeService.OrderRecipesByIngredients(_applicationDbContext.FreshFridgeItems(request.UserId).Select(x => x.IngredientId).ToList(), new List<RecipeDto>() { recipeInServingSize }).FirstOrDefault();
+         
         }
     }
 }
