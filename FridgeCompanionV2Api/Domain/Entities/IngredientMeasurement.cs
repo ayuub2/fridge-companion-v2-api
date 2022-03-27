@@ -9,7 +9,9 @@ namespace FridgeCompanionV2Api.Domain.Entities
     public class IngredientMeasurement
     {
         public int Id { get; set; }
-        public double AverageGrams { get; set; }
+        public decimal? AverageGrams { get; set; }
+        public int IngredientId { get; set; }
+        public int MeasurementId { get; set; }
         public virtual Ingredient Ingredient { get; set; }
         public virtual MeasurementType Measurement { get; set; }
     }

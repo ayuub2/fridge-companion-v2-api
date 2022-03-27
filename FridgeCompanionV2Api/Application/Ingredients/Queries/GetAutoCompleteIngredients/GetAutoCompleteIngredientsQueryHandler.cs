@@ -4,6 +4,7 @@ using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Domain.Entities;
 using FuzzySharp;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,13 @@ namespace FridgeCompanionV2Api.Application.Ingredients.Queries.GetAutoCompleteIn
             {
                 throw new ArgumentNullException(nameof(request));
             }
-            var ingredients = _applicationDbContext.Ingredients.Where(x => !x.IsDeleted).ToList();
+            var ingredients = _applicationDbContext.Ingredients
+                .Include(x => x.DietTypes)
+                    .ThenInclude(idt => idt.Diet)
+                .Include(x => x.Location)
+                .Include(x => x.GroupTypes)
+                    .ThenInclude(idt => idt.IngredientGroupType)
+                .Where(x => !x.IsDeleted).AsNoTracking().ToList();
             var results = Process.ExtractTop(request.Query, ingredients
                 .Select(x => x.Name).ToArray(), limit: 10, cutoff: 60);
             var ingredientResults = new List<Ingredient>();

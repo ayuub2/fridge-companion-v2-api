@@ -1,5 +1,6 @@
 ﻿using FridgeCompanionV2Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,6 +31,8 @@ namespace FridgeCompanionV2Api.Application.Common.Interfaces
         public DbSet<UserDiets> UserDiets { get; set; }
         DbContext Instance { get; }
 
+        IQueryable<FridgeItem> FreshFridgeItems(string userId);
+        IQueryable<Recipe> GetRecipesWithDetails();
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
         DbSet<ShoppingList> ShoppingLists { get; set; }
         DbSet<ShoppingListItem> ShoppingListItems { get; set; }

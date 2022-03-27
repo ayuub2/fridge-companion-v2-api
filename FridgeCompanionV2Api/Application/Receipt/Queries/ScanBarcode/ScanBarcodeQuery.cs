@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
+namespace FridgeCompanionV2Api.Application.Receipt.Queries.ScanBarcode
 {
-    public class GetRecipesQuery : IRequest<List<RecipeDto>>
+    public class ScanBarcodeQuery : IRequest<ScanBarcodeDto>
     {
         public string UserId { get; set; }
-        public List<int> ExcludeRecipes { get; set; } = new List<int>();
+        public string EAN { get; set; }
     }
 }

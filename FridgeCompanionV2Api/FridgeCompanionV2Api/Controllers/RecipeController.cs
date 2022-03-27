@@ -1,5 +1,6 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
+using FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,14 +29,20 @@ namespace FridgeCompanionV2Api.Controllers
 
 
 
-        [HttpGet("GetRecipes")]
-        public async Task<ActionResult<List<RecipeDto>>> GetRecipes()
+        [HttpPost("GetRecipes")]
+        public async Task<ActionResult<List<RecipeDto>>> GetRecipes(List<int> recipesIdsToExclude)
         {
-            GetRecipesQuery command = new GetRecipesQuery();
-            command.UserId = _currentUserService.UserId;
-            return await Mediator.Send(command);
+            GetRecipesQuery query = new GetRecipesQuery();
+            query.ExcludeRecipes = recipesIdsToExclude;
+            query.UserId = _currentUserService.UserId;
+            return await Mediator.Send(query);
         }
 
-
+        [HttpPost("Filter")]
+        public async Task<ActionResult<List<RecipeDto>>> Filter(GetFilteredRecipesQuery query)
+        {
+            query.UserId = _currentUserService.UserId;
+            return await Mediator.Send(query);
+        }
     }
 }

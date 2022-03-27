@@ -6,6 +6,7 @@ using FridgeCompanionV2Api.Application.User.Commands.AddMadeRecipe;
 using FridgeCompanionV2Api.Application.User.Commands.CreateUserProfile;
 using FridgeCompanionV2Api.Application.User.Commands.DeleteFavouriteRecipe;
 using FridgeCompanionV2Api.Application.User.Commands.DeleteMadeRecipe;
+using FridgeCompanionV2Api.Application.User.Commands.RemoveRecipeIngredientsFromFridge;
 using FridgeCompanionV2Api.Application.User.Commands.UpdateUserProfile;
 using FridgeCompanionV2Api.Application.User.Queries.GetUserProfile;
 using Microsoft.AspNetCore.Authorization;
@@ -81,6 +82,13 @@ namespace FridgeCompanionV2Api.Controllers
         {
             command.UserId = _currentUserService.UserId;
             return await Mediator.Send(command);
+        }
+
+        [HttpPost("RemoveRecipeIngredientsFromFridgeCommand")]
+        public async Task RemoveRecipeIngredientsFromFridgeCommand(RemoveRecipeIngredientsFromFridgeCommand command)
+        {
+            command.UserId = _currentUserService.UserId;
+            await Mediator.Send(command);
         }
     }
 }

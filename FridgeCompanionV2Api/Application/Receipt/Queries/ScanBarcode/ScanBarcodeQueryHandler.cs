@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using FridgeCompanionV2Api.Application.Common.Exceptions;
+using FridgeCompanionV2Api.Application.Common.HttpClients;
 using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
-using FridgeCompanionV2Api.Domain.Entities;
+using FridgeCompanionV2Api.Application.Receipt.Queries.ScanReceipt;
 using FuzzySharp;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -12,27 +14,30 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FridgeCompanionV2Api.Application.Ingredients.Queries.GetIngredientsByName
+namespace FridgeCompanionV2Api.Application.Receipt.Queries.ScanBarcode
 {
-    public class GetIngredientByNameQueryHandler : IRequestHandler<GetIngredientByNameQuery, List<IngredientDto>>
+    public class ScanBarcodeQueryHandler : IRequestHandler<ScanBarcodeQuery, ScanBarcodeDto>
     {
         private readonly IApplicationDbContext _applicationDbContext;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
+        private readonly IBarcodeClient _barcodeClient;
 
-        public GetIngredientByNameQueryHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<GetIngredientByNameQueryHandler> logger)
+        public ScanBarcodeQueryHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<ScanReceiptQueryHandler> logger, IBarcodeClient barcodeClient)
         {
             _applicationDbContext = applicationDbContext ?? throw new ArgumentNullException(nameof(applicationDbContext));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _barcodeClient = barcodeClient ?? throw new ArgumentNullException(nameof(barcodeClient));
         }
 
-        public async Task<List<IngredientDto>> Handle(GetIngredientByNameQuery request, CancellationToken cancellationToken)
+        public async Task<ScanBarcodeDto> Handle(ScanBarcodeQuery request, CancellationToken cancellationToken)
         {
             if (request is null)
             {
                 throw new ArgumentNullException(nameof(request));
             }
+
             var ingredients = _applicationDbContext.Ingredients
                 .Include(x => x.DietTypes)
                     .ThenInclude(idt => idt.Diet)
@@ -40,18 +45,18 @@ namespace FridgeCompanionV2Api.Application.Ingredients.Queries.GetIngredientsByN
                 .Include(x => x.GroupTypes)
                     .ThenInclude(idt => idt.IngredientGroupType)
                 .Where(x => !x.IsDeleted).AsNoTracking().ToList();
-            var foundIngredients = new List<Ingredient>();
 
-            foreach (var ingredientName in request.IngredientNames)
+            var productName = await _barcodeClient.GetItemName(request.EAN);
+
+            var results = Process.ExtractOne(productName, ingredients
+                        .Select(x => x.Name).ToArray(), cutoff: 85);
+            if (results != null)
             {
-                var result = Process.ExtractOne(ingredientName, ingredients.Select(x => x.Name).ToArray(), cutoff: 70);
-                if (result is not null) 
-                {
-                    foundIngredients.Add(ingredients.ElementAt(result.Index));
-                }
+                var ingredient = ingredients.ElementAt(results.Index);
+                return new ScanBarcodeDto() { Ingredient = _mapper.Map<IngredientDto>(ingredient) };
             }
 
-            return _mapper.Map<List<IngredientDto>>(foundIngredients);
+            throw new NotFoundException();
         }
     }
 }

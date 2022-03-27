@@ -4,6 +4,7 @@ using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace FridgeCompanionV2Api.Application.User.Commands.DeleteFavouriteRecipe
                 throw new ArgumentNullException(nameof(request));
             }
 
-            var user = _applicationDbContext.Users.FirstOrDefault(x => x.Id == request.UserId);
+            var user = _applicationDbContext.Users.Include(x => x.UserFavouriteRecipes).FirstOrDefault(x => x.Id == request.UserId);
 
             if (user is null)
             {

@@ -9,7 +9,7 @@ namespace FridgeCompanionV2Api.Domain.Entities
     public class FridgeItem
     {
         public Guid Id { get; set; }
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
         public DateTime Expiration { get; set; }
         public int MeasurementId { get; set; }
         public int IngredientId { get; set; }

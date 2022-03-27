@@ -39,7 +39,7 @@ namespace FridgeCompanionV2Api
 
             services.AddControllers();
 
-            services.AddApplication();
+            services.AddApplication(Configuration);
             services.AddInfrastructure(Configuration);
 
             services.AddDatabaseDeveloperPageExceptionFilter();
@@ -103,8 +103,6 @@ namespace FridgeCompanionV2Api
                       ValidateLifetime = true
                   };
               });
-
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

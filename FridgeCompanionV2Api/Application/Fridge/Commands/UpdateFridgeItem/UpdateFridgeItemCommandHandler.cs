@@ -6,6 +6,7 @@ using FridgeCompanionV2Api.Domain.Entities;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -32,7 +33,7 @@ namespace FridgeCompanionV2Api.Application.Fridge.Commands.UpdateFridgeItem
                 throw new ArgumentNullException(nameof(request));
             }
 
-            var entity = _applicationDbContext.FridgeItems.FirstOrDefault(x => x.Id == request.Id);
+            var entity = _applicationDbContext.FridgeItems.Include(x => x.Ingredient).Include(x => x.Measurement).Include(x => x.IngredientLocation).FirstOrDefault(x => x.Id == request.Id);
 
             if (entity is null)
             {
@@ -59,6 +60,7 @@ namespace FridgeCompanionV2Api.Application.Fridge.Commands.UpdateFridgeItem
             entity.Expiration = request.Expiration;
             entity.Amount = request.Amount;
             var updatedEntity = _applicationDbContext.FridgeItems.Update(entity);
+            await _applicationDbContext.SaveChangesAsync(cancellationToken);
 
             return _mapper.Map<FridgeItemDto>(updatedEntity.Entity);
         }

@@ -42,9 +42,9 @@ namespace FridgeCompanionV2Api.Application.User.Commands.UpdateUserProfile
 
             var userDiets = _applicationDbContext.UserDiets.Where(x => x.User.Id == request.UserId);
 
-            if (!userDiets.Any())
+            if (userDiets == null)
             {
-                _logger.LogError($"Attempted to update userDiet that does not exist, userId - {request.UserId}.");
+                _logger.LogError($"Attempted to update user diet that does not exist, userId - {request.UserId}.");
                 throw new NotFoundException("User not found");
             }
             try

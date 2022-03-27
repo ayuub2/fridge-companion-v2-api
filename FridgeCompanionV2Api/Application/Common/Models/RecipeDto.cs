@@ -19,5 +19,7 @@ namespace FridgeCompanionV2Api.Application.Common.Models
         public List<RecipeDishDto> DishTypes { get; set; }
         public List<RecipeCuisineDto> CuisineTypes { get; set; }
         public List<RecipeStepDto> RecipeSteps { get; set; }
+        public int NumberOfIngredients => Ingredients.Count();
+        public int NumberOfUsedIngredients { get; set; }
     }
 }
