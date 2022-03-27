@@ -1,4 +1,5 @@
-﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
+﻿using AutoMapper;
+using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes;
 using FridgeCompanionV2Api.Domain.Entities;
@@ -100,6 +101,41 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
         public List<RecipeDto> FilterGlutenRecipes(List<RecipeDto> recipes) 
         {
             return recipes.Where(x => x.CuisineTypes.Any(x => x.Name == "Gluten Free")).ToList();
+        }
+
+        public RecipeDto GetRecipeInServingSize(int ServingSize, RecipeDto recipe, IApplicationDbContext dbcontext, IMapper mapper) 
+        {
+            // The ingredient converter will be used to get one serving size of current recipe
+            decimal ingredientConverter = decimal.Divide(1, recipe.Servings);
+            recipe.Servings = ServingSize;
+            foreach (var ingredient in recipe.Ingredients)
+            {
+                // Get ingredient amount for one serving size, then use that to get for serving size requested
+                var ingredientAmountForOneServing = ingredient.Amount * ingredientConverter;
+                var ingredientAmountForRequestingServing = ingredientAmountForOneServing * ServingSize;
+
+                // if the amount falls below 1 then we convert to grams for better experience
+                if (ingredientAmountForRequestingServing < 1 && ingredient.Measurement.Name != "Grams") 
+                {
+                    var measurementType = dbcontext.IngredientMeasurements.FirstOrDefault(x => x.MeasurementId == ingredient.Measurement.Id &&
+                                            x.IngredientId == ingredient.Ingredient.Id);
+                    var ingredientGrams = measurementType.AverageGrams != null ? measurementType.AverageGrams.Value * ingredient.Amount : Convert.ToDecimal(ingredient.Amount);
+                    ingredient.Amount = (int)ingredientGrams;
+                    ingredient.Measurement = mapper.Map<MeasurementTypeDto>(dbcontext.MeasurementTypes.FirstOrDefault(x => x.Name == "Grams"));
+                } else 
+                {
+                    ingredient.Amount = (int)ingredientAmountForRequestingServing;
+                }
+
+                // we convert each nutrition amount to the serving size amount
+                ingredient.Ingredient.Calories = (int)(ingredient.Ingredient.Calories * ingredientConverter * ServingSize);
+                ingredient.Ingredient.Protein = ingredient.Ingredient.Protein * ingredientConverter * ServingSize;
+                ingredient.Ingredient.Carb = ingredient.Ingredient.Carb * ingredientConverter * ServingSize;
+                ingredient.Ingredient.Fat = ingredient.Ingredient.Fat * ingredientConverter * ServingSize;
+                ingredient.Ingredient.Sugar = ingredient.Ingredient.Sugar * ingredientConverter * ServingSize;
+                ingredient.Ingredient.Fibre = ingredient.Ingredient.Fibre * ingredientConverter * ServingSize;
+            }
+            return recipe;
         }
 
         public List<RecipeDto> RemoveRecipesContainingNuts(List<RecipeDto> recipes)
