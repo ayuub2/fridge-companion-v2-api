@@ -7,6 +7,6 @@ namespace FridgeCompanionV2Api.Application.Common.Models
 {
     public class ScanBarcodeDto
     {
-        public IngredientDto Ingredients { get; set; }
+        public IngredientDto Ingredient { get; set; }
     }
 }

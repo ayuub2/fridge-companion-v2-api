@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using FridgeCompanionV2Api.Application.Common.Exceptions;
 using FridgeCompanionV2Api.Application.Common.HttpClients;
 using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Application.Receipt.Queries.ScanReceipt;
+using FuzzySharp;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -46,7 +48,15 @@ namespace FridgeCompanionV2Api.Application.Receipt.Queries.ScanBarcode
 
             var productName = await _barcodeClient.GetItemName(request.EAN);
 
-            throw new NotImplementedException();
+            var results = Process.ExtractOne(productName, ingredients
+                        .Select(x => x.Name).ToArray(), cutoff: 85);
+            if (results != null)
+            {
+                var ingredient = ingredients.ElementAt(results.Index);
+                return new ScanBarcodeDto() { Ingredient = _mapper.Map<IngredientDto>(ingredient) };
+            }
+
+            throw new NotFoundException();
         }
     }
 }
