@@ -1,4 +1,5 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
+using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Infrastructure.Files;
 using FridgeCompanionV2Api.Infrastructure.Persistence;
 using FridgeCompanionV2Api.Infrastructure.Services;
@@ -12,12 +13,12 @@ namespace FridgeCompanionV2Api.Infrastructure
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration, SecretConfig config)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options
                 .UseSqlServer(
-                    configuration.GetConnectionString("FridgeCompanionApi"),
+                    config.DatabaseConnectionString,
                     b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
             
 
