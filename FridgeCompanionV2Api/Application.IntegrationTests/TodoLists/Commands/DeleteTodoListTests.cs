@@ -1,42 +1,42 @@
-﻿using FridgeCompanionV2Api.Application.Common.Exceptions;
-using FridgeCompanionV2Api.Application.TodoLists.Commands.CreateTodoList;
-using FridgeCompanionV2Api.Application.TodoLists.Commands.DeleteTodoList;
-using FridgeCompanionV2Api.Domain.Entities;
-using FluentAssertions;
-using NUnit.Framework;
-using System.Threading.Tasks;
+﻿//using FridgeCompanionV2Api.Application.Common.Exceptions;
+//using FridgeCompanionV2Api.Application.TodoLists.Commands.CreateTodoList;
+//using FridgeCompanionV2Api.Application.TodoLists.Commands.DeleteTodoList;
+//using FridgeCompanionV2Api.Domain.Entities;
+//using FluentAssertions;
+//using NUnit.Framework;
+//using System.Threading.Tasks;
 
-namespace FridgeCompanionV2Api.Application.IntegrationTests.TodoLists.Commands
-{
-    using static Testing;
+//namespace FridgeCompanionV2Api.Application.IntegrationTests.TodoLists.Commands
+//{
+//    using static Testing;
 
-    public class DeleteTodoListTests : TestBase
-    {
-        [Test]
-        public void ShouldRequireValidTodoListId()
-        {
-            var command = new DeleteTodoListCommand { Id = 99 };
+//    public class DeleteTodoListTests : TestBase
+//    {
+//        [Test]
+//        public void ShouldRequireValidTodoListId()
+//        {
+//            var command = new DeleteTodoListCommand { Id = 99 };
 
-            FluentActions.Invoking(() =>
-                SendAsync(command)).Should().Throw<NotFoundException>();
-        }
+//            FluentActions.Invoking(() =>
+//                SendAsync(command)).Should().Throw<NotFoundException>();
+//        }
 
-        [Test]
-        public async Task ShouldDeleteTodoList()
-        {
-            var listId = await SendAsync(new CreateTodoListCommand
-            {
-                Title = "New List"
-            });
+//        [Test]
+//        public async Task ShouldDeleteTodoList()
+//        {
+//            var listId = await SendAsync(new CreateTodoListCommand
+//            {
+//                Title = "New List"
+//            });
 
-            await SendAsync(new DeleteTodoListCommand 
-            { 
-                Id = listId 
-            });
+//            await SendAsync(new DeleteTodoListCommand 
+//            { 
+//                Id = listId 
+//            });
 
-            var list = await FindAsync<TodoList>(listId);
+//            var list = await FindAsync<TodoList>(listId);
 
-            list.Should().BeNull();
-        }
-    }
-}
+//            list.Should().BeNull();
+//        }
+//    }
+//}

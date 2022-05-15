@@ -1,63 +1,66 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
-using FridgeCompanionV2Api.Domain.Common;
 using FridgeCompanionV2Api.Domain.Entities;
-using FridgeCompanionV2Api.Infrastructure.Identity;
-using IdentityServer4.EntityFramework.Options;
-using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using System;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FridgeCompanionV2Api.Infrastructure.Persistence
 {
-    public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, IApplicationDbContext
+    public class ApplicationDbContext : DbContext, IApplicationDbContext
     {
-        private readonly ICurrentUserService _currentUserService;
-        private readonly IDateTime _dateTime;
-        private readonly IDomainEventService _domainEventService;
-
-        public ApplicationDbContext(
-            DbContextOptions options,
-            IOptions<OperationalStoreOptions> operationalStoreOptions,
-            ICurrentUserService currentUserService,
-            IDomainEventService domainEventService,
-            IDateTime dateTime) : base(options, operationalStoreOptions)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-            _currentUserService = currentUserService;
-            _domainEventService = domainEventService;
-            _dateTime = dateTime;
-        }
 
+        }
         public DbSet<TodoItem> TodoItems { get; set; }
 
         public DbSet<TodoList> TodoLists { get; set; }
 
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+        public DbSet<ShoppingList> ShoppingLists { get; set; }
+        public DbSet<ShoppingListItem> ShoppingListItems { get; set; }
+        public DbSet<Recipe> Recipes { get; set; }
+        public DbSet<CuisineType> CuisineTypes { get; set; }
+        public DbSet<DietType> DietTypes { get; set; }
+        public DbSet<DishType> DishTypes { get; set; }
+        public DbSet<Ingredient> Ingredients { get; set; }
+        public DbSet<IngredientGroupType> IngredientGroupTypes { get; set; }
+        public DbSet<IngredientLocation> IngredientLocations { get; set; }
+        public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
+        public DbSet<MeasurementType> MeasurementTypes { get; set; }
+        public DbSet<RecipeStep> RecipeSteps { get; set; }
+        public DbSet<RecipeDish> RecipeDishes { get; set; }
+        public DbSet<RecipeCuisine> RecipeCuisines { get; set; }
+        public DbSet<IngredientDiet> IngredientDiets { get; set; }
+        public DbSet<IngredientType> IngredientTypes { get; set; }
+        public DbSet<FridgeItem> FridgeItems { get; set; }
+        public DbSet<IngredientMeasurement> IngredientMeasurements { get; set; }
+
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserDiets> UserDiets { get; set; }
+
+        public DbContext Instance => this;
+
+
+        public IQueryable<Recipe> GetRecipesWithDetails() 
         {
-            foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<AuditableEntity> entry in ChangeTracker.Entries<AuditableEntity>())
-            {
-                switch (entry.State)
-                {
-                    case EntityState.Added:
-                        entry.Entity.CreatedBy = _currentUserService.UserId;
-                        entry.Entity.Created = _dateTime.Now;
-                        break;
-
-                    case EntityState.Modified:
-                        entry.Entity.LastModifiedBy = _currentUserService.UserId;
-                        entry.Entity.LastModified = _dateTime.Now;
-                        break;
-                }
-            }
-
-            var result = await base.SaveChangesAsync(cancellationToken);
-
-            await DispatchEvents();
-
-            return result;
+            return Recipes
+                .Include(x => x.Ingredients)
+                    .ThenInclude(x => x.Ingredient)
+                        .ThenInclude(x => x.Location)
+                .Include(x => x.Ingredients).ThenInclude(x => x.Measurement)
+                .Include(x => x.Ingredients).ThenInclude(i => i.Ingredient).ThenInclude(id => id.GroupTypes).ThenInclude(idt => idt.IngredientGroupType)
+                .Include(x => x.Ingredients).ThenInclude(i => i.Ingredient).ThenInclude(id => id.DietTypes).ThenInclude(idt => idt.Diet)
+                .Include(x => x.DishTypes)
+                    .ThenInclude(x => x.Dish)
+                .Include(x => x.RecipeSteps)
+                .Include(x => x.CuisineTypes)
+                    .ThenInclude(x => x.Cuisine).AsNoTracking()
+                .Where(x => !x.IsDeleted);
+        }
+        public IQueryable<FridgeItem> FreshFridgeItems(string userId)
+        {
+            return FridgeItems.Include(x => x.Ingredient).Include(x=> x.Measurement).Include(x => x.IngredientLocation).Where(x => x.UserId == userId && !x.IsDeleted && DateTime.Now < x.Expiration);
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -65,22 +68,6 @@ namespace FridgeCompanionV2Api.Infrastructure.Persistence
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             base.OnModelCreating(builder);
-        }
-
-        private async Task DispatchEvents()
-        {
-            while (true)
-            {
-                var domainEventEntity = ChangeTracker.Entries<IHasDomainEvent>()
-                    .Select(x => x.Entity.DomainEvents)
-                    .SelectMany(x => x)
-                    .Where(domainEvent => !domainEvent.IsPublished)
-                    .FirstOrDefault();
-                if (domainEventEntity == null) break;
-
-                domainEventEntity.IsPublished = true;
-                await _domainEventService.Publish(domainEventEntity);
-            }
         }
     }
 }
