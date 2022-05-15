@@ -134,6 +134,7 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
                 ingredient.Ingredient.Fat = ingredient.Ingredient.Fat * ingredientConverter * ServingSize;
                 ingredient.Ingredient.Sugar = ingredient.Ingredient.Sugar * ingredientConverter * ServingSize;
                 ingredient.Ingredient.Fibre = ingredient.Ingredient.Fibre * ingredientConverter * ServingSize;
+            
             }
             return recipe;
         }

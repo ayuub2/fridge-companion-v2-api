@@ -1,6 +1,7 @@
 using FluentValidation.AspNetCore;
 using FridgeCompanionV2Api.Application;
 using FridgeCompanionV2Api.Application.Common.Interfaces;
+using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Filters;
 using FridgeCompanionV2Api.Infrastructure;
 using FridgeCompanionV2Api.Infrastructure.Persistence;
@@ -17,6 +18,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,15 +38,15 @@ namespace FridgeCompanionV2Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers();
-
             services.AddApplication(Configuration);
-            services.AddInfrastructure(Configuration);
+            var secretConfig = JsonConvert.DeserializeObject<SecretConfig>(new SecretManager().Get("prod_fridgecompanionv2"));
+            services.AddInfrastructure(Configuration, secretConfig);
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-           
+
+            
 
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
 

@@ -1,6 +1,7 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes;
+using FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipeById;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipeByServingSize;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes;
 using Microsoft.AspNetCore.Authorization;
@@ -52,6 +53,15 @@ namespace FridgeCompanionV2Api.Controllers
             GetRecipeByServingSizeQuery query = new GetRecipeByServingSizeQuery();
             query.RecipeId = recipeId;
             query.ServingSize = servingSize;
+            query.UserId = _currentUserService.UserId;
+            return await Mediator.Send(query);
+        }
+
+        [HttpGet("GetRecipeById")]
+        public async Task<ActionResult<RecipeDto>> GetRecipeById(int recipeId)
+        {
+            GetRecipeByIdQuery query = new GetRecipeByIdQuery();
+            query.RecipeId = recipeId;
             query.UserId = _currentUserService.UserId;
             return await Mediator.Send(query);
         }

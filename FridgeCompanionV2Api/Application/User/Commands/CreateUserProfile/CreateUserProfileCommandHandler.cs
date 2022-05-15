@@ -46,7 +46,7 @@ namespace FridgeCompanionV2Api.Application.User.Commands.CreateUserProfile
                     IsAllergicNuts = request.IsAllergicNuts
                 });
                 await _applicationDbContext.SaveChangesAsync(cancellationToken);
-                var diets = request.Diets.Select(x => x.Id).Select(x => _applicationDbContext.DietTypes.FirstOrDefault(d => d.Id == x)).ToList();
+                var diets = request.Diets.Select(x => x.Id).Distinct().Select(x => _applicationDbContext.DietTypes.FirstOrDefault(d => d.Id == x)).ToList();
                 if(diets.Any()) 
                 {
                     _applicationDbContext.UserDiets.AddRange(diets.Select(x => new UserDiets() { User = userEntity.Entity, DietType = x }));
