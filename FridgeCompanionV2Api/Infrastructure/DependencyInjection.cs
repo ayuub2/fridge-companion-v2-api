@@ -18,7 +18,7 @@ namespace FridgeCompanionV2Api.Infrastructure
             services.AddDbContext<ApplicationDbContext>(options =>
                 options
                 .UseSqlServer(
-                    config.DatabaseConnectionString,
+                    configuration.GetConnectionString("FridgeCompanionApi"),
                     b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
             
 
