@@ -20,22 +20,22 @@ namespace FridgeCompanionV2Api.Controllers
     [Authorize]
     [ApiController]
     [Route("[controller]")]
-    public class DishTypesController : ApiControllerBase
+    public class IngredientGroupTypesController : ApiControllerBase
     {
 
-        private readonly ILogger<DishTypesController> _logger;
+        private readonly ILogger<IngredientGroupTypesController> _logger;
         private readonly ICurrentUserService _currentUserService;
 
-        public DishTypesController(ILogger<DishTypesController> logger, ICurrentUserService currentUserService)
+        public IngredientGroupTypesController(ILogger<IngredientGroupTypesController> logger, ICurrentUserService currentUserService)
         {
             _currentUserService = currentUserService ?? throw new ArgumentNullException(nameof(currentUserService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpGet()]
-        public async Task<ActionResult<List<DishTypeDto>>> GetItems()
+        public async Task<ActionResult<List<IngredientGroupTypeDto>>> GetItems()
         {
-            GetIngredientGroupTypes query = new GetIngredientGroupTypes();
+            GetIngredientGroupTypesQuery query = new GetIngredientGroupTypesQuery();
             query.UserId = _currentUserService.UserId;
             return await Mediator.Send(query);
         }

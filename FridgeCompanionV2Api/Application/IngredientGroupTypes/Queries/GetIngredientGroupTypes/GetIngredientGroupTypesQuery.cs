@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FridgeCompanionV2Api.Application.CuisineTypes.Queries.GetCuisineTypes
 {
-    public class GetIngredientGroupTypes : IRequest<List<DishTypeDto>>
+    public class GetIngredientGroupTypesQuery : IRequest<List<IngredientGroupTypeDto>>
     {
         public string UserId { get; set; }
     }

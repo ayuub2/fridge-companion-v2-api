@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace FridgeCompanionV2Api.Application.CuisineTypes.Queries.GetCuisineTypes
 {
-    public class GetDishTypesQueryHandler : IRequestHandler<GetIngredientGroupTypes, List<DishTypeDto>>
+    public class GetIngredientGroupTypesQueryHandler : IRequestHandler<GetIngredientGroupTypesQuery, List<IngredientGroupTypeDto>>
     {
         private readonly IApplicationDbContext _applicationDbContext;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
 
-        public GetDishTypesQueryHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<GetDishTypesQueryHandler> logger)
+        public GetIngredientGroupTypesQueryHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<GetIngredientGroupTypesQuery> logger)
         {
             _applicationDbContext = applicationDbContext ?? throw new ArgumentNullException(nameof(applicationDbContext));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -25,18 +25,18 @@ namespace FridgeCompanionV2Api.Application.CuisineTypes.Queries.GetCuisineTypes
         }
 
 
-        public async Task<List<DishTypeDto>> Handle(GetIngredientGroupTypes request, CancellationToken cancellationToken)
+        public async Task<List<IngredientGroupTypeDto>> Handle(GetIngredientGroupTypesQuery request, CancellationToken cancellationToken)
         {
             if (request is null)
             {
                 throw new ArgumentNullException(nameof(request));
             }
 
-            _logger.LogInformation($"Getting dish types for user {request.UserId}.");
+            _logger.LogInformation($"Getting ingredient group types for user {request.UserId}.");
 
-            var types = _applicationDbContext.DishTypes.ToList();
+            var types = _applicationDbContext.IngredientGroupTypes.ToList();
 
-            return _mapper.Map<List<DishTypeDto>>(types);
+            return _mapper.Map<List<IngredientGroupTypeDto>>(types);
         }
     }
 }
