@@ -32,6 +32,8 @@ namespace FridgeCompanionV2Api.Application.Fridge.Queries.GetAllFridgeItems
                 throw new ArgumentNullException(nameof(request));
             }
 
+            _logger.LogInformation($"Getting user fridge items {request.UserId}.");
+
             var items = _applicationDbContext.FridgeItems
                 .Include(x => x.IngredientLocation)
                 .Include(x => x.Ingredient)

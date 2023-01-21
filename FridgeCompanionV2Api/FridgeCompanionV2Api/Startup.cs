@@ -40,8 +40,8 @@ namespace FridgeCompanionV2Api
         {
             services.AddControllers();
             services.AddApplication(Configuration);
-            var secretConfig = JsonConvert.DeserializeObject<SecretConfig>(new SecretManager().Get("prod_fridgecompanionv2"));
-            services.AddInfrastructure(Configuration, secretConfig);
+            //var secretConfig = JsonConvert.DeserializeObject<SecretConfig>(new SecretManager().Get("prod_fridgecompanionv2"));
+            services.AddInfrastructure(Configuration, new SecretConfig());
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
