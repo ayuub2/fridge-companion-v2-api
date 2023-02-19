@@ -29,6 +29,8 @@ namespace FridgeCompanionV2Api.Application.Common.Interfaces
         public DbSet<IngredientMeasurement> IngredientMeasurements { get; set; }
         public DbSet<Domain.Entities.User> Users { get; set; }
         public DbSet<UserDiets> UserDiets { get; set; }
+        public DbSet<Suggestion> Suggestions { get; set; }
+        public DbSet<SuggestionRecipe> SuggestionsRecipes { get; set; }
         DbContext Instance { get; }
 
         IQueryable<FridgeItem> FreshFridgeItems(string userId);
