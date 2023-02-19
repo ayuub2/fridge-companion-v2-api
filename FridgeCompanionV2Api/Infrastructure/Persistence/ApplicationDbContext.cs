@@ -35,6 +35,9 @@ namespace FridgeCompanionV2Api.Infrastructure.Persistence
         public DbSet<IngredientType> IngredientTypes { get; set; }
         public DbSet<FridgeItem> FridgeItems { get; set; }
         public DbSet<IngredientMeasurement> IngredientMeasurements { get; set; }
+        public DbSet<Suggestion> Suggestions { get; set; }
+
+        public DbSet<SuggestionRecipe> SuggestionsRecipes { get; set; }
 
         public DbSet<User> Users { get; set; }
         public DbSet<UserDiets> UserDiets { get; set; }
