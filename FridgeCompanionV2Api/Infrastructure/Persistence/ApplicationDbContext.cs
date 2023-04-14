@@ -59,11 +59,11 @@ namespace FridgeCompanionV2Api.Infrastructure.Persistence
                 .Include(x => x.RecipeSteps)
                 .Include(x => x.CuisineTypes)
                     .ThenInclude(x => x.Cuisine).AsNoTracking()
-                .Where(x => !x.IsDeleted);
+                .Where(x => !x.IsDeleted).AsSplitQuery();
         }
         public IQueryable<FridgeItem> FreshFridgeItems(string userId)
         {
-            return FridgeItems.Include(x => x.Ingredient).Include(x=> x.Measurement).Include(x => x.IngredientLocation).Where(x => x.UserId == userId && !x.IsDeleted && DateTime.Now < x.Expiration);
+            return FridgeItems.Include(x => x.Ingredient).Include(x=> x.Measurement).Include(x => x.IngredientLocation).Where(x => x.UserId == userId && !x.IsDeleted && DateTime.Now < x.Expiration).AsSplitQuery();
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
