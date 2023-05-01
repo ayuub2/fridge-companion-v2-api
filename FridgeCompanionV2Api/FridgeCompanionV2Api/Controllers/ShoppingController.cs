@@ -34,6 +34,7 @@ namespace FridgeCompanionV2Api.Controllers
         [HttpPost("List")]
         public async Task<ActionResult<ShoppingListDto>> CreateList(CreateShoppingListCommand command)
         {
+            // create list
             command.UserId = _currentUserService.UserId;
             return await Mediator.Send(command);
         }
