@@ -34,10 +34,10 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.CreateShopping
 
             try
             {
-                var shoppingList = _applicationDbContext.ShoppingLists.FirstOrDefault(x => x.UserId == request.UserId);
+                var shoppingList = _applicationDbContext.ShoppingList.FirstOrDefault(x => x.UserId == request.UserId);
                 if (shoppingList is null) 
                 {
-                    shoppingList = _applicationDbContext.ShoppingLists.Add(new Domain.Entities.ShoppingList()
+                    shoppingList = _applicationDbContext.ShoppingList.Add(new Domain.Entities.ShoppingList()
                     {
                         Name = "Default shopping list",
                         UserId = request.UserId
@@ -45,7 +45,7 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.CreateShopping
                     await _applicationDbContext.SaveChangesAsync(cancellationToken);
                 }
 
-                var addedItem = _applicationDbContext.ShoppingListItems.Add(new Domain.Entities.ShoppingListItem() 
+                var addedItem = _applicationDbContext.ShoppingListItem.Add(new Domain.Entities.ShoppingListItem() 
                 {
                     Name = request.Name,
                     IsChecked = false,
