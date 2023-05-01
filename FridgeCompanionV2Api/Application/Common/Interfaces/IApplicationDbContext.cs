@@ -36,7 +36,7 @@ namespace FridgeCompanionV2Api.Application.Common.Interfaces
         IQueryable<FridgeItem> FreshFridgeItems(string userId);
         IQueryable<Recipe> GetRecipesWithDetails();
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
-        DbSet<ShoppingList> ShoppingLists { get; set; }
-        DbSet<ShoppingListItem> ShoppingListItems { get; set; }
+        DbSet<ShoppingList> ShoppingList { get; set; }
+        DbSet<ShoppingListItem> ShoppingListItem { get; set; }
     }
 }

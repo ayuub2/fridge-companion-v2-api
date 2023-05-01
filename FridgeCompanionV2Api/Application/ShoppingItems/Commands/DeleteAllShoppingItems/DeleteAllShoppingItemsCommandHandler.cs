@@ -31,13 +31,13 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.DeleteAllShopp
             {
                 throw new ArgumentNullException(nameof(request));
             }
-            var shoppingList = _applicationDbContext.ShoppingLists.FirstOrDefault(x => x.UserId == request.UserId);
+            var shoppingList = _applicationDbContext.ShoppingList.FirstOrDefault(x => x.UserId == request.UserId);
             if (shoppingList is null) 
             {
                 _logger.LogError($"Unable to delete all shopping items for user - {request.UserId}");
                 throw new NotFoundException("No shopping list for user, please add an item first.");
             }
-            var items = _applicationDbContext.ShoppingListItems.Where(x => x.ShoppingListId == shoppingList.Id).ToList();
+            var items = _applicationDbContext.ShoppingListItem.Where(x => x.ShoppingListId == shoppingList.Id).ToList();
             if (!items.Any())
             {
                 _logger.LogError($"Unable to delete all shopping items for user - {request.UserId}");

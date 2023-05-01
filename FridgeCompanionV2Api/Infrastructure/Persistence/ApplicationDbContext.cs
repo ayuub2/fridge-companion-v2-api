@@ -17,8 +17,8 @@ namespace FridgeCompanionV2Api.Infrastructure.Persistence
 
         public DbSet<TodoList> TodoLists { get; set; }
 
-        public DbSet<ShoppingList> ShoppingLists { get; set; }
-        public DbSet<ShoppingListItem> ShoppingListItems { get; set; }
+        public DbSet<ShoppingList> ShoppingList { get; set; }
+        public DbSet<ShoppingListItem> ShoppingListItem { get; set; }
         public DbSet<Recipe> Recipes { get; set; }
         public DbSet<CuisineType> CuisineTypes { get; set; }
         public DbSet<DietType> DietTypes { get; set; }

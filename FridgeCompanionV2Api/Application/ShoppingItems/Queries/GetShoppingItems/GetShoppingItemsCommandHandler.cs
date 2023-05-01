@@ -31,18 +31,18 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Queries.GetShoppingItem
             {
                 throw new ArgumentNullException(nameof(request));
             }
-            var shoppingList = _applicationDbContext.ShoppingLists.FirstOrDefault(x => x.UserId == request.UserId);
+            var shoppingList = _applicationDbContext.ShoppingList.FirstOrDefault(x => x.UserId == request.UserId);
             if (shoppingList is null)
             {
-                _logger.LogError($"Unable to  get shopping items for user - {request.UserId}");
-                throw new NotFoundException("No shopping list for user, please add an item first.");
+                shoppingList = _applicationDbContext.ShoppingList.Add(new Domain.Entities.ShoppingList()
+                {
+                    Name = "Default shopping list",
+                    UserId = request.UserId
+                }).Entity;
+                await _applicationDbContext.SaveChangesAsync(cancellationToken);
             }
-            var items = _applicationDbContext.ShoppingListItems.Where(x => x.ShoppingListId == shoppingList.Id && !x.IsDeleted).ToList();
-            if (!items.Any())
-            {
-                _logger.LogError($"Unable to get all shopping items for user - {request.UserId}");
-                throw new NotFoundException("Shopping Items not found");
-            }
+            var items = _applicationDbContext.ShoppingListItem.Where(x => x.ShoppingListId == shoppingList.Id && !x.IsDeleted).ToList();
+            
             return _mapper.Map<List<ShoppingItemDto>>(items);
         }
     }
