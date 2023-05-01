@@ -32,7 +32,7 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.DeleteShopping
                 throw new ArgumentNullException(nameof(request));
             }
 
-            var item = _applicationDbContext.ShoppingListItems.FirstOrDefault(x => x.Id == request.Id);
+            var item = _applicationDbContext.ShoppingListItem.FirstOrDefault(x => x.Id == request.Id);
             if (item is null) 
             {
                 _logger.LogError($"Unable to delete shopping item for user - {request.UserId}");
