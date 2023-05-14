@@ -90,7 +90,10 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
                 foreach (var ingredient in recipe.Ingredients)
                 {
                     if (ingredientIds.Contains(ingredient.Ingredient.Id))
+                    {
+                        ingredient.UserHasIngredient = true;
                         count++;
+                    }
                 }
                 recipe.NumberOfUsedIngredients = count;
             }
