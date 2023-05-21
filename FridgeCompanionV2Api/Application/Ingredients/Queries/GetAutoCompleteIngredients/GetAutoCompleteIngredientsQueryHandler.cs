@@ -39,6 +39,8 @@ namespace FridgeCompanionV2Api.Application.Ingredients.Queries.GetAutoCompleteIn
                 .Include(x => x.Location)
                 .Include(x => x.GroupTypes)
                     .ThenInclude(idt => idt.IngredientGroupType)
+                .Include(x => x.MeasurementTypes)
+                    .ThenInclude(idt => idt.Measurement)
                 .Where(x => !x.IsDeleted).AsNoTracking().ToList();
             var results = Process.ExtractTop(request.Query, ingredients
                 .Select(x => x.Name).ToArray(), limit: 10, cutoff: 60);
