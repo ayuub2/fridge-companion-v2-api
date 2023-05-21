@@ -24,6 +24,7 @@ namespace FridgeCompanionV2Api.Domain.Entities
         public virtual IngredientLocation Location { get; set; }
 
         public virtual List<IngredientDiet> DietTypes { get; set; }
+        public virtual List<IngredientMeasurement> MeasurementTypes { get; set; }
         public virtual List<IngredientType> GroupTypes { get; set; }
     }
 }
