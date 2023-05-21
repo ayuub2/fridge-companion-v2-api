@@ -22,5 +22,6 @@ namespace FridgeCompanionV2Api.Application.Common.Models
 
         public List<IngredientDietDto> DietTypes { get; set; }
         public List<IngredientTypeDto> GroupTypes { get; set; }
+        public List<IngredientMeasurementTypeDto> MeasurementTypes { get; set; }
     }
 }
