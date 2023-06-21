@@ -12,6 +12,5 @@ namespace FridgeCompanionV2Api.Domain.Entities
         public int RecipeId { get; set; }
         public int SuggestionId { get; set; }
         public virtual Suggestion Suggestion { get; set; }
-        public virtual Recipe Recipe { get; set; }
     }
 }

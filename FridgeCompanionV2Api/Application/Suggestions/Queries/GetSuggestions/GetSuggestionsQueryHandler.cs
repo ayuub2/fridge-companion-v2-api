@@ -35,14 +35,14 @@ namespace FridgeCompanionV2Api.Application.CuisineTypes.Queries.GetCuisineTypes
 
             _logger.LogInformation($"Getting suggestions for user {request.UserId}.");
 
-            var suggestions = _applicationDbContext.Suggestions.Where(x => !x.IsDeleted).Include(x => x.Recipes).ThenInclude(x => x.Recipe).ToList();
+            var suggestions = _applicationDbContext.Suggestions.Where(x => !x.IsDeleted).Include(x => x.SuggestionRecipes).ToList();
 
             var suggestionsDto = suggestions.Select(x => new SuggestionDto()
             {
                 Id = x.Id,
                 Name = x.Name,
-                ImageUrl = x.ImageUrl,
-                Recipes = _mapper.Map<List<RecipeDto>>(x.Recipes.Select(x => x.Recipe).ToList())
+                ImageUrl = _applicationDbContext.Recipes.FirstOrDefault(r => r.Id == x.SuggestionRecipes.FirstOrDefault().RecipeId).Image,
+                RecipeIds = x.SuggestionRecipes.Select(sr => sr.RecipeId).ToList(),
             });
 
             return suggestionsDto.ToList();
