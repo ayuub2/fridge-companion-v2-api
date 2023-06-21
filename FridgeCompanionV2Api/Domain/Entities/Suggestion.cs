@@ -10,8 +10,7 @@ namespace FridgeCompanionV2Api.Domain.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string ImageUrl { get; set; }
         public bool IsDeleted { get; set; }
-        public virtual List<SuggestionRecipe> Recipes { get; set; }
+        public virtual List<SuggestionRecipe> SuggestionRecipes { get; set; }
     }
 }

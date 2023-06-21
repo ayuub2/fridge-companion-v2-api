@@ -10,6 +10,6 @@ namespace FridgeCompanionV2Api.Application.Common.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string ImageUrl { get; set; }
-        public virtual List<RecipeDto> Recipes { get; set; }
+        public virtual List<int> RecipeIds { get; set; }
     }
 }
