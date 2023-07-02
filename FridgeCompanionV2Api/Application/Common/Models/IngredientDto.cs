@@ -18,6 +18,7 @@ namespace FridgeCompanionV2Api.Application.Common.Models
         public int Calories { get; set; }
         public int AverageExpiryDays { get; set; }
         public bool IsGlutenFree { get; set; }
+        public bool IsNutFree { get; set; }
         public IngredientLocationDto Location { get; set; }
 
         public List<IngredientDietDto> DietTypes { get; set; }

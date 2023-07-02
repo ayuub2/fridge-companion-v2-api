@@ -34,7 +34,6 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
             // check if they have user profile otherwise ignore preferences
             // check their fridge contents and compare them with recipe ingredients
 
-            // TODO: Implement isNutFree
 
             if (request is null)
             {
@@ -64,6 +63,7 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
             var recipes = _mapper.Map<List<RecipeDto>>(recipeEntites.ToList());
 
             if (isGlutenFree) recipes = _recipeService.FilterGlutenRecipes(recipes);
+            if (isAllergicNuts) recipes = _recipeService.RemoveRecipesContainingNuts(recipes);
 
 
             // we need reicpes where all the ingredients have all the diets specified by the user
