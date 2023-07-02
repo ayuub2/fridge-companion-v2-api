@@ -31,7 +31,6 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
         }
         public async Task<List<RecipeDto>> Handle(GetFilteredRecipesQuery request, CancellationToken cancellationToken)
         {
-            // TODO: Final test and combination of filters
             if (request is null)
             {
                 throw new ArgumentNullException(nameof(request));
@@ -62,12 +61,11 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
             // Filter using ingredients
             recipes = _recipeService.FilterIngredients(request.Ingredients, recipes);
 
-            // TODO: filter isNutFree, do we need to make sure we always check the users profile? Also make sure you do normal recipe isNutFree, its not implemented
-            if(request.IsNutFree)
+            if(request.IsNutFree || user.IsAllergicNuts)
                 recipes = _recipeService.RemoveRecipesContainingNuts(recipes);
 
 
-            if(request.IsGlutenFree) 
+            if(request.IsGlutenFree || user.IsGlutenFree) 
             {
                 recipes = _recipeService.FilterGlutenRecipes(recipes);
             }
