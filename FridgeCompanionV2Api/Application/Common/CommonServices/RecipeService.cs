@@ -144,7 +144,7 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
 
         public List<RecipeDto> RemoveRecipesContainingNuts(List<RecipeDto> recipes)
         {
-            throw new NotImplementedException();
+            return recipes.Where(x => !x.Ingredients.Any(ing => !ing.Ingredient.IsNutFree)).ToList();
         }
     }
 }

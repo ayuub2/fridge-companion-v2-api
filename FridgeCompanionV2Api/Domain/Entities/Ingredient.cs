@@ -19,6 +19,7 @@ namespace FridgeCompanionV2Api.Domain.Entities
         public int Calories { get; set; }
         public int AverageExpiryDays { get; set; }
         public bool IsGlutenFree { get; set; }
+        public bool IsNutFree { get; set; }
         public bool IsDeleted { get; set; }
 
         public virtual IngredientLocation Location { get; set; }
