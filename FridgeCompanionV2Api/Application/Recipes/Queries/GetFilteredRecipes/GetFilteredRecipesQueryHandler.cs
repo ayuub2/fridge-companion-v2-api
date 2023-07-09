@@ -61,11 +61,11 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
             // Filter using ingredients
             recipes = _recipeService.FilterIngredients(request.Ingredients, recipes);
 
-            if(request.IsNutFree || user.IsAllergicNuts)
+            if(request.IsNutFree || (user is not null && user.IsAllergicNuts))
                 recipes = _recipeService.RemoveRecipesContainingNuts(recipes);
 
 
-            if(request.IsGlutenFree || user.IsGlutenFree) 
+            if(request.IsGlutenFree || (user is not null && user.IsGlutenFree))
             {
                 recipes = _recipeService.FilterGlutenRecipes(recipes);
             }
