@@ -3,7 +3,7 @@ using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes;
 using FridgeCompanionV2Api.Domain.Entities;
-using FuzzySharp;
+using FuzzyString;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,8 +27,15 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
         {
             if (!string.IsNullOrEmpty(recipeName))
             {
-                var results = Process.ExtractAll(new RecipeDto() { Name = recipeName }, recipes, recipe => recipe.Name, cutoff: 60);
-                recipes = results.Select(x => x.Value).ToList();
+                var matches = recipes
+                    .Select(recipe => new { Recipe = recipe, Score = recipe.Name.ToLower().JaroWinklerDistance(recipeName.ToLower()) })
+                    .OrderByDescending(match => match.Score)
+                    .Where(match => match.Score >= 0.7)
+                    .Take(10)
+                    .Select(x => x.Recipe)
+                    .ToList();
+
+                recipes = matches;
             }
 
             return recipes;
