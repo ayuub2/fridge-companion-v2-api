@@ -2,7 +2,7 @@
 using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Domain.Entities;
-using FuzzySharp;
+using FuzzyString;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -42,15 +42,16 @@ namespace FridgeCompanionV2Api.Application.Ingredients.Queries.GetAutoCompleteIn
                 .Include(x => x.MeasurementTypes)
                     .ThenInclude(idt => idt.Measurement)
                 .Where(x => !x.IsDeleted).AsNoTracking().ToList();
-            var results = Process.ExtractTop(request.Query, ingredients
-                .Select(x => x.Name).ToArray(), limit: 10, cutoff: 60);
-            var ingredientResults = new List<Ingredient>();
-            results.ToList().ForEach(x =>
-            {
-                ingredientResults.Add(ingredients.ElementAt(x.Index));
-            });
+           
+            var matches = ingredients
+            .Select(ingredient => new { Ingredient = ingredient, Score = ingredient.Name.ToLower().JaroWinklerDistance(request.Query.ToLower()) })
+            .OrderByDescending(match => match.Score)
+            .Where(match => match.Score >= 0.7)
+            .Take(10)
+            .Select(x => x.Ingredient)
+            .ToList();
 
-            return _mapper.Map<List<IngredientDto>>(ingredientResults);
+            return _mapper.Map<List<IngredientDto>>(matches);
         }
     }
 }
