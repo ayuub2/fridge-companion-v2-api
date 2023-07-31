@@ -30,7 +30,7 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
                 var matches = recipes
                     .Select(recipe => new { Recipe = recipe, Score = recipe.Name.ToLower().JaroWinklerDistance(recipeName.ToLower()) })
                     .OrderByDescending(match => match.Score)
-                    .Where(match => match.Score >= 0.7)
+                    .Where(match => match.Score >= 0.5)
                     .Take(10)
                     .Select(x => x.Recipe)
                     .ToList();
