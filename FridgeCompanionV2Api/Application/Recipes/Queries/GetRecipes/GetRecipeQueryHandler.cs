@@ -41,14 +41,11 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
             }
 
             var user = _applicationDbContext.Users.Include(x => x.UserDiets).ThenInclude(x => x.DietType).FirstOrDefault(x => x.Id == request.UserId);
-            var isAllergicNuts = false;
-            var isGlutenFree = false;
+
             List<DietType> userDiets = new List<DietType>();
 
             if (user is not null) 
             {
-                isAllergicNuts = user.IsAllergicNuts;
-                isGlutenFree = user.IsGlutenFree;
                 userDiets = user.UserDiets.Select(x => x.DietType).ToList();
             }
 
@@ -61,9 +58,6 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
             recipeEntites = _recipeService.ExcludeRecipes(request.ExcludeRecipes, recipeEntites);
 
             var recipes = _mapper.Map<List<RecipeDto>>(recipeEntites.ToList());
-
-            if (isGlutenFree) recipes = _recipeService.FilterGlutenRecipes(recipes);
-            if (isAllergicNuts) recipes = _recipeService.RemoveRecipesContainingNuts(recipes);
 
 
             // we need reicpes where all the ingredients have all the diets specified by the user

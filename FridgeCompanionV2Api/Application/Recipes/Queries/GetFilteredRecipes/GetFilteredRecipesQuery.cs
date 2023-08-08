@@ -16,8 +16,6 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
         public List<int> CuisineTypes { get; set; } = new List<int>();
         public List<int> Ingredients { get; set; } = new List<int>();
         public string RecipeName { get; set; }
-        public bool IsNutFree { get; set; }
-        public bool IsGlutenFree { get; set; }
         public NutritionFilter Protein { get; set; }
         public NutritionFilter Calories { get; set; }
         public NutritionFilter Sugar { get; set; }

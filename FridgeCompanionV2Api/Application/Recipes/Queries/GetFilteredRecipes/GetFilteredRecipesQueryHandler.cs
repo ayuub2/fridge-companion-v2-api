@@ -61,14 +61,6 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
             // Filter using ingredients
             recipes = _recipeService.FilterIngredients(request.Ingredients, recipes);
 
-            if(request.IsNutFree || (user is not null && user.IsAllergicNuts))
-                recipes = _recipeService.RemoveRecipesContainingNuts(recipes);
-
-
-            if(request.IsGlutenFree || (user is not null && user.IsGlutenFree))
-            {
-                recipes = _recipeService.FilterGlutenRecipes(recipes);
-            }
             // Filter using protein
             if (request.Protein is not null) 
             {
@@ -103,7 +95,6 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
             if (request.UseUserIngredients)
             {
                 var freshFridgeItems = _applicationDbContext.FreshFridgeItems(request.UserId).ToList();
-                recipes = _recipeService.FilterUsingFridgeItems(freshFridgeItems, recipes);
                 recipes = _recipeService.OrderRecipesByIngredients(freshFridgeItems.Select(x => x.IngredientId).ToList(), recipes);
             }
             if (request.Ingredients.Any() && !request.UseUserIngredients) 

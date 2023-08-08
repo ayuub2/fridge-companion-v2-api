@@ -41,9 +41,7 @@ namespace FridgeCompanionV2Api.Application.User.Commands.CreateUserProfile
             {
                 var userEntity = _applicationDbContext.Users.Add(new Domain.Entities.User() 
                 {
-                    Id = request.UserId,
-                    IsGlutenFree = request.IsGlutenFree,
-                    IsAllergicNuts = request.IsAllergicNuts
+                    Id = request.UserId
                 });
                 await _applicationDbContext.SaveChangesAsync(cancellationToken);
                 var diets = request.Diets.Select(x => x.Id).Distinct().Select(x => _applicationDbContext.DietTypes.FirstOrDefault(d => d.Id == x)).ToList();

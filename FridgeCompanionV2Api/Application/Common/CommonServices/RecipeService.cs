@@ -77,17 +77,7 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
             }
             return recipes;
         }
-
-        public List<RecipeDto> FilterUsingFridgeItems(List<FridgeItem> fridgeItems, List<RecipeDto> recipes)
-        {
-            if (fridgeItems.Any())
-            {
-                var fridgeItemIngredientIds = fridgeItems.Select(x => x.IngredientId).ToList();
-                recipes = recipes.Where(x => x.Ingredients.Any(ing => fridgeItemIngredientIds.Contains(ing.Ingredient.Id))).ToList();
-
-            }
-            return recipes;
-        }
+      
 
         public List<RecipeDto> OrderRecipesByIngredients(List<int> ingredientIds, List<RecipeDto> recipes) 
         {
@@ -106,11 +96,6 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
             }
 
             return recipes.OrderByDescending(x => (x.NumberOfUsedIngredients * 100) / x.NumberOfIngredients).ToList();
-        }
-
-        public List<RecipeDto> FilterGlutenRecipes(List<RecipeDto> recipes) 
-        {
-            return recipes.Where(x => x.CuisineTypes.Any(x => x.Name == "Gluten Free")).ToList();
         }
 
         public RecipeDto GetRecipeInServingSize(int ServingSize, RecipeDto recipe, IApplicationDbContext dbcontext, IMapper mapper) 
@@ -147,11 +132,6 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
             
             }
             return recipe;
-        }
-
-        public List<RecipeDto> RemoveRecipesContainingNuts(List<RecipeDto> recipes)
-        {
-            return recipes.Where(x => !x.Ingredients.Any(ing => !ing.Ingredient.IsNutFree)).ToList();
         }
     }
 }

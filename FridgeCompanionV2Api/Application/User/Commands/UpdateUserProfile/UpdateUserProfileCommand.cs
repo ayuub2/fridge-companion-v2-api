@@ -10,8 +10,6 @@ namespace FridgeCompanionV2Api.Application.User.Commands.UpdateUserProfile
     public class UpdateUserProfileCommand : IRequest<UserDto>
     {
         public string UserId { get; set; }
-        public bool IsGlutenFree { get; set; }
-        public bool IsAllergicNuts { get; set; }
         public List<DietTypeDto> Diets { get; set; }
     }
 }
