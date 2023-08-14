@@ -51,6 +51,7 @@ namespace FridgeCompanionV2Api.Application.User.Commands.UpdateUserProfile
             {
                 var diets = request.Diets.Select(x => x.Id).Distinct().Select(x => _applicationDbContext.DietTypes.FirstOrDefault(d => d.Id == x)).ToList();
                 _applicationDbContext.UserDiets.RemoveRange(userDiets);
+                await _applicationDbContext.SaveChangesAsync(cancellationToken);
                 _applicationDbContext.UserDiets.AddRange(diets.Select(x => new UserDiets() { User = user, DietType = x }));
                 await _applicationDbContext.SaveChangesAsync(cancellationToken);
                 return _mapper.Map<UserDto>(user);
