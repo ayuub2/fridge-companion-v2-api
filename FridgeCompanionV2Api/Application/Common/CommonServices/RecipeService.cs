@@ -121,7 +121,11 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
                 {
                     ingredient.Amount = (int)ingredientAmountForRequestingServing;
                 }
-
+                // we need to first convert the base nutrition for the amount based on their measurement
+                // so lets say we have 10 tbs of olive oil, but the standard is 800g worth, the calories are way off, so we need to get for 
+                // the default servings, how much calories. Once we have that we can get it for one serving size and times it by the new serving sizes.
+                // which is the code we have here already. So before we come here we need to ensure we have the correct calories for the default serving size.
+                // 
                 // we convert each nutrition amount to the serving size amount
                 ingredient.Ingredient.Calories = (int)(ingredient.Ingredient.Calories * ingredientConverter * ServingSize);
                 ingredient.Ingredient.Protein = ingredient.Ingredient.Protein * ingredientConverter * ServingSize;

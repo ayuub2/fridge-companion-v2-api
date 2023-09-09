@@ -21,13 +21,15 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
         private readonly IRecipeService _recipeService;
+        private readonly IConverterService _converterService;
 
-        public GetFilteredRecipesQueryHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<GetFilteredRecipesQueryHandler> logger, IRecipeService recipeService)
+        public GetFilteredRecipesQueryHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<GetFilteredRecipesQueryHandler> logger, IRecipeService recipeService, IConverterService converterService)
         {
             _applicationDbContext = applicationDbContext ?? throw new ArgumentNullException(nameof(applicationDbContext));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _recipeService = recipeService ?? throw new ArgumentNullException(nameof(recipeService));
+            _converterService = converterService ?? throw new ArgumentNullException(nameof(converterService));
         }
         public async Task<List<RecipeDto>> Handle(GetFilteredRecipesQuery request, CancellationToken cancellationToken)
         {
@@ -120,41 +122,32 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
                 decimal recipeNutrition = 0;
                 foreach (var ingredient in recipe.Ingredients)
                 {
-                    var amount = ingredient.Amount;
-                    var measurement = ingredient.Measurement;
+
                     //For each ingredient we must get the measurement it was saved at and convert to grams
-                    var measurementType = _applicationDbContext.IngredientMeasurements.FirstOrDefault(x => x.MeasurementId == ingredient.Measurement.Id &&
-                                                x.IngredientId == ingredient.Ingredient.Id);
-                    if (measurementType != null)
+                    // Using the average grams of the measurement and the amount of that measurement we have, we can get the grams of that ingredient
+                    var ingredientGrams = _converterService.ConvertIngredientAmountToGrams(ingredient);
+                    // Since the nutrional information is saved at a 100 gram standard we need to divide the ingredient grams by the standard
+                    var gramsFactor = ingredientGrams / ingredient.Ingredient.Standard;
+                    // Finally we take the factor multiplied by the nutrition to give us the nutrition for the amount of grams we have
+                    switch (nutrition)
                     {
-                        // Using the average grams of the measurement and the amount of that measurement we have, we can get the grams of that ingredient
-                        var ingredientGrams = measurementType.AverageGrams != null ? measurementType.AverageGrams.Value * ingredient.Amount : Convert.ToDecimal(ingredient.Amount);
-                        // Since the nutrional information is saved at a 100 gram standard we need to divide the ingredient grams by the standard
-                        var gramsFactor = ingredientGrams / ingredient.Ingredient.Standard;
-                        // Finally we take the factor multiplied by the nutrition to give us the nutrition for the amount of grams we have
-                        switch (nutrition)
-                        {
-                            case Nutrition.Protein:
-                                recipeNutrition += (gramsFactor * ingredient.Ingredient.Protein);
-                                break;
-                            case Nutrition.Calories:
-                                recipeNutrition += (gramsFactor * ingredient.Ingredient.Calories);
-                                break;
-                            case Nutrition.Sugar:
-                                recipeNutrition += (gramsFactor * ingredient.Ingredient.Sugar);
-                                break;
-                            case Nutrition.Fat:
-                                recipeNutrition += (gramsFactor * ingredient.Ingredient.Fat);
-                                break;
-                            case Nutrition.Carb:
-                                recipeNutrition += (gramsFactor * ingredient.Ingredient.Carb);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    else {
-                        throw new NotFoundException();
+                        case Nutrition.Protein:
+                            recipeNutrition += (gramsFactor * ingredient.Ingredient.Protein);
+                            break;
+                        case Nutrition.Calories:
+                            recipeNutrition += (gramsFactor * ingredient.Ingredient.Calories);
+                            break;
+                        case Nutrition.Sugar:
+                            recipeNutrition += (gramsFactor * ingredient.Ingredient.Sugar);
+                            break;
+                        case Nutrition.Fat:
+                            recipeNutrition += (gramsFactor * ingredient.Ingredient.Fat);
+                            break;
+                        case Nutrition.Carb:
+                            recipeNutrition += (gramsFactor * ingredient.Ingredient.Carb);
+                            break;
+                        default:
+                            break;
                     }
                 }
                 switch (nutritionFilter.Operator.ToUpper())

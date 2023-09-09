@@ -32,6 +32,7 @@ namespace FridgeCompanionV2Api.Application
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
             services.AddScoped<IRecipeService, RecipeService>();
+            services.AddScoped<IConverterService, ConverterService>();
 
 
             return services;
