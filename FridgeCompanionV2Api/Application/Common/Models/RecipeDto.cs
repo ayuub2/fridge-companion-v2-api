@@ -15,6 +15,7 @@ namespace FridgeCompanionV2Api.Application.Common.Models
         public string Summary { get; set; }
         public string Credit { get; set; }
         public bool IsDeleted { get; set; }
+        public NutritionDto Nutrition { get; set; }
         public List<RecipeIngredientDto> Ingredients { get; set; }
         public List<RecipeDishDto> DishTypes { get; set; }
         public List<RecipeCuisineDto> CuisineTypes { get; set; }
