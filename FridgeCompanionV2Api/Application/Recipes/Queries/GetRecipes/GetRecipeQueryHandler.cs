@@ -84,7 +84,7 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes
             }
 
             //TODO: Add exclude
-            return recipes.Take(10).ToList();
+            return recipes.Take(30).ToList();
         }
 
         private RecipeDto GetRandomRecipe(List<RecipeDto> recipes)
