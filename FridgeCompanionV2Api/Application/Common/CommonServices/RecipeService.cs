@@ -13,6 +13,15 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
 {
     public class RecipeService : IRecipeService
     {
+        private readonly IConverterService _converterService;
+        private readonly IApplicationDbContext _context;
+        private readonly IMapper _mapper;
+        public RecipeService(IConverterService converterService, IApplicationDbContext context, IMapper mapper)
+        {
+            _converterService = converterService ?? throw new ArgumentNullException(nameof(converterService));
+            _context = context;
+            _mapper = mapper;
+        }
         public List<RecipeDto> FilterDiets(List<int> diets, List<RecipeDto> recipes)
         {
             if (diets.Any())
@@ -98,25 +107,25 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
             return recipes.OrderByDescending(x => (x.NumberOfUsedIngredients * 100) / x.NumberOfIngredients).ToList();
         }
 
-        public RecipeDto GetRecipeInServingSize(int ServingSize, RecipeDto recipe, IApplicationDbContext dbcontext, IMapper mapper) 
+        public RecipeDto GetRecipeInServingSize(int servingSize, RecipeDto recipe) 
         {
             // The ingredient converter will be used to get one serving size of current recipe
             decimal ingredientConverter = decimal.Divide(1, recipe.Servings);
-            recipe.Servings = ServingSize;
+            recipe.Servings = servingSize;
             foreach (var ingredient in recipe.Ingredients)
             {
                 // Get ingredient amount for one serving size, then use that to get for serving size requested
                 var ingredientAmountForOneServing = ingredient.Amount * ingredientConverter;
-                var ingredientAmountForRequestingServing = ingredientAmountForOneServing * ServingSize;
+                var ingredientAmountForRequestingServing = ingredientAmountForOneServing * servingSize;
 
                 // if the amount falls below 1 then we convert to grams for better experience
                 if (ingredientAmountForRequestingServing < 1 && ingredient.Measurement.Name != "Grams") 
                 {
-                    var measurementType = dbcontext.IngredientMeasurements.FirstOrDefault(x => x.MeasurementId == ingredient.Measurement.Id &&
+                    var measurementType = _context.IngredientMeasurements.FirstOrDefault(x => x.MeasurementId == ingredient.Measurement.Id &&
                                             x.IngredientId == ingredient.Ingredient.Id);
                     var ingredientGrams = measurementType.AverageGrams != null ? measurementType.AverageGrams.Value * ingredient.Amount : Convert.ToDecimal(ingredient.Amount);
                     ingredient.Amount = (int)ingredientGrams;
-                    ingredient.Measurement = mapper.Map<MeasurementTypeDto>(dbcontext.MeasurementTypes.FirstOrDefault(x => x.Name == "Grams"));
+                    ingredient.Measurement = _mapper.Map<MeasurementTypeDto>(_context.MeasurementTypes.FirstOrDefault(x => x.Name == "Grams"));
                 } else 
                 {
                     ingredient.Amount = (int)ingredientAmountForRequestingServing;
@@ -127,14 +136,85 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
                 // which is the code we have here already. So before we come here we need to ensure we have the correct calories for the default serving size.
                 // 
                 // we convert each nutrition amount to the serving size amount
-                ingredient.Ingredient.Calories = (int)(ingredient.Ingredient.Calories * ingredientConverter * ServingSize);
-                ingredient.Ingredient.Protein = ingredient.Ingredient.Protein * ingredientConverter * ServingSize;
-                ingredient.Ingredient.Carb = ingredient.Ingredient.Carb * ingredientConverter * ServingSize;
-                ingredient.Ingredient.Fat = ingredient.Ingredient.Fat * ingredientConverter * ServingSize;
-                ingredient.Ingredient.Sugar = ingredient.Ingredient.Sugar * ingredientConverter * ServingSize;
-                ingredient.Ingredient.Fibre = ingredient.Ingredient.Fibre * ingredientConverter * ServingSize;
+                ingredient.Ingredient.Calories = (int)(ingredient.Ingredient.Calories * ingredientConverter * servingSize);
+                ingredient.Ingredient.Protein = ingredient.Ingredient.Protein * ingredientConverter * servingSize;
+                ingredient.Ingredient.Carb = ingredient.Ingredient.Carb * ingredientConverter * servingSize;
+                ingredient.Ingredient.Fat = ingredient.Ingredient.Fat * ingredientConverter * servingSize;
+                ingredient.Ingredient.Sugar = ingredient.Ingredient.Sugar * ingredientConverter * servingSize;
+                ingredient.Ingredient.Fibre = ingredient.Ingredient.Fibre * ingredientConverter * servingSize;
             
             }
+            return recipe;
+        }
+
+        public List<RecipeDto> PopulateUserFavourites(List<UserFavouriteRecipes> favourites, List<RecipeDto> recipes)
+        {
+            recipes.ForEach(recipe => recipe.isFavourited = favourites.Any(x => x.RecipeId == recipe.Id));
+            return recipes;
+        }
+
+        public List<RecipeDto> CalculateNutrition(List<RecipeDto> recipes)
+        {
+            foreach (var recipe in recipes)
+            {
+                // foreach ingredient in the recipe we convert the nutritional values are relevant to the serving size of the recipe
+                foreach (var ingredient in recipe.Ingredients)
+                {
+                    // we first convert the ingredient amount from any measurement type to grams. This will allow us to compare to the
+                    // ingredient standard which is in grams and is used to determine the nutritional values saved in the DB
+                    var ingredientGrams = _converterService.ConvertIngredientAmountToGrams(ingredient);
+                    var gramFactor = ingredientGrams / ingredient.Ingredient.Standard;
+                    var ingredientDto = ingredient.Ingredient;
+                    ingredientDto.Calories = decimal.ToInt32(ingredientDto.Calories * gramFactor);
+                    ingredientDto.Protein = ingredientDto.Protein * gramFactor;
+                    ingredientDto.Fat = ingredientDto.Fat * gramFactor;
+                    ingredientDto.Fibre = ingredientDto.Fibre * gramFactor;
+                    ingredientDto.Carb = ingredientDto.Carb * gramFactor;
+                    ingredientDto.Sugar = ingredientDto.Sugar * gramFactor;
+                }
+                var recipeInServingSize = GetRecipeInServingSize(recipe.Servings, recipe);
+
+                recipeInServingSize.Nutrition = new NutritionDto()
+                {
+                    Calories = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Calories),
+                    Protein = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Protein),
+                    Fat = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Fat),
+                    Fibre = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Fibre),
+                    Carb = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Carb),
+                    Sugar = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Sugar)
+                };
+            }
+            return recipes;
+        }
+
+        public RecipeDto CalculateNutrition(int servingSize, RecipeDto recipe)
+        {
+            // foreach ingredient in the recipe we convert the nutritional values are relevant to the serving size of the recipe
+            foreach (var ingredient in recipe.Ingredients)
+            {
+                // we first convert the ingredient amount from any measurement type to grams. This will allow us to compare to the
+                // ingredient standard which is in grams and is used to determine the nutritional values saved in the DB
+                var ingredientGrams = _converterService.ConvertIngredientAmountToGrams(ingredient);
+                var gramFactor = ingredientGrams / ingredient.Ingredient.Standard;
+                var ingredientDto = ingredient.Ingredient;
+                ingredientDto.Calories = decimal.ToInt32(ingredientDto.Calories * gramFactor);
+                ingredientDto.Protein = ingredientDto.Protein * gramFactor;
+                ingredientDto.Fat = ingredientDto.Fat * gramFactor;
+                ingredientDto.Fibre = ingredientDto.Fibre * gramFactor;
+                ingredientDto.Carb = ingredientDto.Carb * gramFactor;
+                ingredientDto.Sugar = ingredientDto.Sugar * gramFactor;
+            }
+            var recipeInServingSize = GetRecipeInServingSize(servingSize, recipe);
+
+            recipeInServingSize.Nutrition = new NutritionDto()
+            {
+                Calories = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Calories),
+                Protein = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Protein),
+                Fat = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Fat),
+                Fibre = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Fibre),
+                Carb = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Carb),
+                Sugar = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Sugar)
+            };
             return recipe;
         }
     }

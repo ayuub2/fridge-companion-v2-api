@@ -40,7 +40,11 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
 
             var recipesEntites = _applicationDbContext.GetRecipesWithDetails();
 
-            var user = _applicationDbContext.Users.Include(x => x.UserDiets).ThenInclude(x => x.DietType).FirstOrDefault(x => x.Id == request.UserId);
+            var user = _applicationDbContext.Users
+                .Include(x => x.UserDiets)
+                    .ThenInclude(x => x.DietType)
+                .Include(x => x.UserFavouriteRecipes)
+                .FirstOrDefault(x => x.Id == request.UserId);
 
             // Filter out excluded recipes
             recipesEntites = _recipeService.ExcludeRecipes(request.RecipesToExclude, recipesEntites);
@@ -109,6 +113,11 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
                 var freshFridgeItems = _applicationDbContext.FreshFridgeItems(request.UserId).ToList();
                 recipes = _recipeService.OrderRecipesByIngredients(freshFridgeItems.Select(x => x.IngredientId).ToList(), recipes);
             }
+
+            // Check if user favourited recipes are returned
+            recipes = _recipeService.PopulateUserFavourites(user.UserFavouriteRecipes, recipes);
+
+            recipes = _recipeService.CalculateNutrition(recipes);
 
 
             return recipes.Take(30).ToList();
