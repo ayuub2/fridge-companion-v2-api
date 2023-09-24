@@ -111,7 +111,7 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
             }
 
 
-            return recipes.Take(10).ToList();
+            return recipes.Take(30).ToList();
         }
 
         public  List<RecipeDto> FilterNutrition(List<RecipeDto> recipes, NutritionFilter nutritionFilter, Nutrition nutrition)
