@@ -22,5 +22,6 @@ namespace FridgeCompanionV2Api.Application.Common.Models
         public List<RecipeStepDto> RecipeSteps { get; set; }
         public int NumberOfIngredients => Ingredients.Count();
         public int NumberOfUsedIngredients { get; set; }
+        public bool isFavourited { get; set; }
     }
 }

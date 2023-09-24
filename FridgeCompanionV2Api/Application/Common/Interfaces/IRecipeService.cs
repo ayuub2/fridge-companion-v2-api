@@ -16,6 +16,9 @@ namespace FridgeCompanionV2Api.Application.Common.Interfaces
         List<RecipeDto> FilterCuisineTypes(List<int> cuisineTypes, List<RecipeDto> recipes);
         List<RecipeDto> FilterIngredients(List<int> ingredients, List<RecipeDto> recipes);
         List<RecipeDto> OrderRecipesByIngredients(List<int> ingredientIds, List<RecipeDto> recipes);
-        RecipeDto GetRecipeInServingSize(int ServingSize, RecipeDto recipe, IApplicationDbContext dbcontext, IMapper mapper);
+        List<RecipeDto> CalculateNutrition(List<RecipeDto> recipes);
+        RecipeDto CalculateNutrition(int servingSize, RecipeDto recipe);
+        List<RecipeDto> PopulateUserFavourites(List<UserFavouriteRecipes> favourites, List<RecipeDto> recipes);
+        RecipeDto GetRecipeInServingSize(int servingSize, RecipeDto recipe);
     }
 }
