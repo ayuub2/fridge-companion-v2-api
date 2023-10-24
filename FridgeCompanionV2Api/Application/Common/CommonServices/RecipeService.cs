@@ -50,6 +50,25 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
             return recipes;
         }
 
+        public List<RecipeDto> FilterUsingRecipeByName(string recipeBy, List<RecipeDto> recipes)
+        {
+            if (!string.IsNullOrEmpty(recipeBy))
+            {
+                var matches = recipes
+                    .Select(recipe => new { Recipe = recipe, Score = recipe.Credit.ToLower().JaroWinklerDistance(recipeBy.ToLower()) })
+                    .OrderByDescending(match => match.Score)
+                    .Where(match => match.Score >= 0.5)
+                    .Take(10)
+                    .Select(x => x.Recipe)
+                    .ToList();
+
+                recipes = matches;
+            }
+
+            return recipes;
+        }
+
+
         public IQueryable<Recipe> ExcludeRecipes(List<int> recipesToExclude, IQueryable<Recipe> recipesEntites)
         {
             foreach (var recipeId in recipesToExclude)
