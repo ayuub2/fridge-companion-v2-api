@@ -97,6 +97,11 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
                 recipes = FilterNutrition(recipes, request.Carbs, Nutrition.Carb);
             }
 
+            if(request.recipeUnderMinutes != 0)
+            {
+                recipes = recipes.Where(x => x.ReadyInMinutes <= request.recipeUnderMinutes).ToList();
+            }
+
             // Fill out missing ingredients and sort
             if (request.UseUserIngredients)
             {

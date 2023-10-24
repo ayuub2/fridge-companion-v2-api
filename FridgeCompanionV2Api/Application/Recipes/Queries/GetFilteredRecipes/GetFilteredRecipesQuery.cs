@@ -22,6 +22,8 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
         public NutritionFilter Fat { get; set; }
         public NutritionFilter Carbs { get; set; }
         public bool UseUserIngredients { get; set; }
+
+        public int recipeUnderMinutes { get; set; }
     }
 
     public class NutritionFilter 
