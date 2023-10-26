@@ -37,6 +37,8 @@ namespace FridgeCompanionV2Api.Application.Fridge.Queries.GetAllFridgeItems
             var items = _applicationDbContext.FridgeItems
                 .Include(x => x.IngredientLocation)
                 .Include(x => x.Ingredient)
+                    .ThenInclude(x => x.MeasurementTypes)
+                        .ThenInclude(x => x.Measurement)
                 .Include(x => x.Measurement)
                 .Where(x => x.UserId == request.UserId && !x.IsDeleted)
                 .ToList();
