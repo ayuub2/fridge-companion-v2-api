@@ -3,6 +3,7 @@ using AutoMapper;
 using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Application.User.Queries.GetUserProfile;
+using FridgeCompanionV2Api.Domain.Entities;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -35,17 +36,17 @@ namespace FridgeCompanionV2Api.Application.Stats.Queries.GetStats
 
             var dateTo = DateTime.UtcNow;
             var dateFrom = DateTime.UtcNow;
-            switch (request.Duration)
+            switch (request.Duration.ToLower())
             {
-                case "Week":
+                case "week":
                     dateTo = DateTime.Now.AddDays(-7);
                     dateFrom = DateTime.Now.AddDays(-14);
                     break;
-                case "Month":
+                case "month":
                     dateTo = DateTime.Now.AddMonths(-1);
                     dateFrom = DateTime.Now.AddMonths(-2);
                     break;
-                case "Year":
+                case "year":
                     dateTo = DateTime.Now.AddYears(-1);
                     dateFrom = DateTime.Now.AddYears(-2);
                     break;
@@ -103,6 +104,14 @@ namespace FridgeCompanionV2Api.Application.Stats.Queries.GetStats
                     IngredientId = x.Key,
                     Count = x.Count()
                 }).OrderByDescending(x => x.Count).FirstOrDefault();
+            if(mostUsedIngredient is null)
+            {
+                return new StatItem()
+                {
+                    Name = "Most used ingredient",
+                    Value = "Not enough data"
+                };
+            }
             var ingredientName = _applicationDbContext.Ingredients.FirstOrDefault(x => x.Id == mostUsedIngredient.IngredientId).Name;
             return new StatItem()
             {
@@ -119,6 +128,14 @@ namespace FridgeCompanionV2Api.Application.Stats.Queries.GetStats
                     RecipeId = x.Key,
                     Count = x.Count()
                 }).OrderByDescending(x => x.Count).FirstOrDefault();
+            if(favouriteRecipeDuringThisRound is null)
+            {
+                return new StatItem()
+                {
+                    Name = "Your favourite recipe",
+                    Value = "Not enough data"
+                };
+            }
             var favouriteRecipeName = _applicationDbContext.Recipes.FirstOrDefault(x => x.Id == favouriteRecipeDuringThisRound.RecipeId).Name;
             return new StatItem()
             {
@@ -129,34 +146,56 @@ namespace FridgeCompanionV2Api.Application.Stats.Queries.GetStats
 
         private StatItem GetExpiredIngredientStat(string userId, DateTime dateDuringThisStatRound, DateTime dateDuringLastStatRound, string duration)
         {
-            var expiredStatDuringThisRound = _applicationDbContext.FridgeItems.Where(x => !x.IsDeleted && x.UserId == userId && x.Expiration <= dateDuringThisStatRound).Count();
-            var expiredStatDuringLastRound = _applicationDbContext.FridgeItems.Where(x => !x.IsDeleted && x.UserId == userId
-                && x.Expiration >= dateDuringLastStatRound
+            var userFridgeItems = _applicationDbContext.FridgeItems.Where(x => !x.IsDeleted && x.UserId == userId);
+            if(!userFridgeItems.Any())
+            {
+                return new StatItem()
+                {
+                    Name = "Expired Ingredients",
+                    Value = "0",
+                };
+            }
+            var expiredStatDuringThisRound = userFridgeItems.Where(x => x.Expiration <= dateDuringThisStatRound).Count();
+            var expiredStatDuringLastRound = userFridgeItems.Where(x => x.Expiration >= dateDuringLastStatRound
                 && x.Expiration < dateDuringThisStatRound).Count();
-            var isUp = expiredStatDuringThisRound > expiredStatDuringLastRound;
+            var isUp = expiredStatDuringThisRound >= expiredStatDuringLastRound;
             var up = isUp ? "Up" : "Down";
             return new StatItem()
             {
                 Name = "Expired Ingredients",
                 Value = expiredStatDuringThisRound.ToString(),
-                From = $"{up} {Math.Abs(expiredStatDuringLastRound - expiredStatDuringThisRound)} last {duration.ToLower()}",
-                IsUp = isUp
+                From = new StatFrom()
+                {
+                    Value = $"{up} {Math.Abs(expiredStatDuringLastRound - expiredStatDuringThisRound)} from last {duration.ToLower()}",
+                    IsUp = isUp
+                }
             };
         }
 
         private StatItem GetRecipesStat(string userId, DateTime dateDuringThisStatRound, DateTime dateDuringLastStatRound, string duration)
         {
-
-            var recipesMadeDuringThisRound = _applicationDbContext.UserMadeRecipes.Where(x => x.UserId == userId && x.CreatedDate >= dateDuringThisStatRound).Count();
-            var recipesMadeDuringLastRound = _applicationDbContext.UserMadeRecipes.Where(x => x.UserId == userId && x.CreatedDate >= dateDuringLastStatRound && x.CreatedDate < dateDuringThisStatRound).Count();
-            var isUp = recipesMadeDuringThisRound > recipesMadeDuringLastRound;
+            var userMadeRecipes = _applicationDbContext.UserMadeRecipes.Where(x => x.UserId == userId);
+            if(!userMadeRecipes.Any()) 
+            {
+                return new StatItem()
+                {
+                    Name = "Recipes Made",
+                    Value = "0",
+                };
+            }
+            var recipesMadeDuringThisRound = userMadeRecipes.Where(x => x.CreatedDate >= dateDuringThisStatRound).Count();
+            var recipesMadeDuringLastRound = userMadeRecipes.Where(x => x.CreatedDate >= dateDuringLastStatRound && x.CreatedDate < dateDuringThisStatRound).Count();
+            var isUp = recipesMadeDuringThisRound >= recipesMadeDuringLastRound;
             var up = isUp ? "Up" : "Down";
             return new StatItem()
             {
-                Name = "Recipes",
+                Name = "Recipes Made",
                 Value = recipesMadeDuringThisRound.ToString(),
-                From =  $"{up} {Math.Abs(recipesMadeDuringLastRound - recipesMadeDuringThisRound)} last {duration.ToLower()}",
-                IsUp = isUp
+                From = new StatFrom() 
+                {
+                    Value = $"{up} {Math.Abs(recipesMadeDuringLastRound - recipesMadeDuringThisRound)} from last {duration.ToLower()}",
+                    IsUp = isUp
+                }
             };
         }
     }

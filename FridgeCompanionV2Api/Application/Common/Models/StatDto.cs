@@ -14,7 +14,13 @@
     {
         public string Name { get; set; }
         public string Value { get; set; }
-        public string From { get; set; }
+        
+        public StatFrom From { get; set; }
+    }
+
+    public class StatFrom
+    {
+        public string Value { get; set; }
         public bool IsUp { get; set; }
     }
 }
