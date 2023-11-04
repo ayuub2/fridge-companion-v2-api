@@ -50,17 +50,14 @@ namespace FridgeCompanionV2Api.Application.User.Commands.AddMadeRecipe
                 throw new NotFoundException("User profile not found, please create user profile first.");
             }
 
-
-            if (!user.UserMadeRecipes.Any(x => x.RecipeId == recipe.Id && x.UserId == user.Id))
+            user.UserMadeRecipes.Add(new UserMadeRecipes()
             {
-                user.UserMadeRecipes.Add(new UserMadeRecipes()
-                {
-                    RecipeId = recipe.Id,
-                    UserId = user.Id
-                });
+                RecipeId = recipe.Id,
+                UserId = user.Id,
+                CreatedDate = DateTime.UtcNow
+            });
 
-                await _applicationDbContext.SaveChangesAsync(cancellationToken);
-            }
+            await _applicationDbContext.SaveChangesAsync(cancellationToken);
 
             return _mapper.Map<UserDto>(user);
         }

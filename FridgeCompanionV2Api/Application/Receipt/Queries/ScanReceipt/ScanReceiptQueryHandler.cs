@@ -77,7 +77,7 @@ namespace FridgeCompanionV2Api.Application.Receipt.Queries.ScanReceipt
             await fileTransferUtility.UploadAsync(uploadRequest);
 
             using var textExtractClient = new AmazonTextractClient(credentials, RegionEndpoint.EUWest1);
-            var textRequest = new DetectDocumentTextRequest()
+            var textRequest = new AnalyzeExpenseRequest()
             {
                 Document = new Document() 
                 {
@@ -88,21 +88,26 @@ namespace FridgeCompanionV2Api.Application.Receipt.Queries.ScanReceipt
                     }
                 },
             };
-            var response = await textExtractClient.DetectDocumentTextAsync(textRequest);
+            var response = await textExtractClient.AnalyzeExpenseAsync(textRequest);
             var ingredientList = new List<Ingredient>();
-            foreach (var block in response.Blocks)
+            var unknownIngredientList = new List<string>();
+            foreach (var lineItem in response.ExpenseDocuments[0]?.LineItemGroups[0]?.LineItems)
             {
-                if(block.BlockType == BlockType.LINE) 
+                var text = lineItem?.LineItemExpenseFields[0]?.ValueDetection.Text;
+                if (!string.IsNullOrEmpty(text))
                 {
-                    var results = Process.ExtractOne(block.Text, ingredients
+                    var results = Process.ExtractOne(text, ingredients
                         .Select(x => x.Name).ToArray(), cutoff: 85);
-                    if(results != null) 
+                    if (results != null)
                     {
                         ingredientList.Add(ingredients.ElementAt(results.Index));
+                    } else
+                    {
+                        unknownIngredientList.Add(text.Replace("\n", " "));
                     }
                 }
             }
-            return new ScanReceiptDto() { Ingredients = _mapper.Map<List<IngredientDto>>(ingredientList) };
+            return new ScanReceiptDto() { Ingredients = _mapper.Map<List<IngredientDto>>(ingredientList), UnknownIngredients = unknownIngredientList };
 
         }
     }

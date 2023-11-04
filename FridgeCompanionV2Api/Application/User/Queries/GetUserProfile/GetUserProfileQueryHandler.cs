@@ -39,6 +39,7 @@ namespace FridgeCompanionV2Api.Application.User.Queries.GetUserProfile
                 .Include(x => x.UserDiets)
                     .ThenInclude(x => x.DietType)
                 .FirstOrDefault(x => x.Id == request.UserId);
+            // Todo: Only return User made recipes if they have different recipe ids
             if(user is null) 
             {
                 _logger.LogError($"Attempted to get user profile for non existent user - {request.UserId}");
