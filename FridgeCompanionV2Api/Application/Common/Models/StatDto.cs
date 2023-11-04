@@ -2,14 +2,12 @@
 {
     public class StatDto
     {
-        public string Duration { get; set; }
         public StatItem Recipes { get; set; }
         public StatItem ExpiredIngredients { get; set; }
         public StatItem MoneySaved { get; set; }
         public StatItem FavouriteRecipe { get; set; }
         public StatItem MostUsedIngredient { get; set; }
-        public StatItem WaterSaved { get; set; }
-        public StatItem CarbonSaved { get; set; }
+        public StatItem NumberOfIngredientsAdded { get; set; }
     }
 
     public class StatItem

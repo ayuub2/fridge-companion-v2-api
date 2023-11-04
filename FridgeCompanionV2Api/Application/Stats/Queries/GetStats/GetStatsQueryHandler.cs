@@ -26,7 +26,7 @@ namespace FridgeCompanionV2Api.Application.Stats.Queries.GetStats
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task<StatDto> Handle(GetStatsQuery request, CancellationToken cancellationToken)
+        public async Task<StatDto> Handle(GetStatsQuery request, CancellationToken cancellationToken)
         {
             if (request is null)  
             {
@@ -53,13 +53,46 @@ namespace FridgeCompanionV2Api.Application.Stats.Queries.GetStats
                     throw new InvalidOperationException("Incorrect date duration supplied");
             }
 
-            var recipes = GetRecipesStat(request.UserId, dateTo, dateFrom, request.Duration);
+            StatItem recipes = GetRecipesStat(request.UserId, dateTo, dateFrom, request.Duration);
 
-            StatItem expiredIngredients = GetExpiredIngredientStat(request.UserId, dateTo, dateFrom, request.Duration);
+            StatItem expiredIngredients = GetExpiredIngredientStat(request.UserId, dateTo, dateFrom, request.Duration); 
 
             StatItem favouriteRecipe = GetFavouriteRecipeStat(request.UserId);
 
             StatItem mostUsedIngredient = GetMostUsedIngredientStat(request.UserId);
+            // Money saved stat - In the future add price per ingredient on the ingredients table and use that to calculate money saved
+            StatItem moneySaved = GetMoneySavedStat(request.UserId);
+            StatItem numberOfIngredientsAdded = GetNumberOfIngredientsAdded(request.UserId);
+
+            return new StatDto()
+            {
+                Recipes = recipes,
+                ExpiredIngredients = expiredIngredients,
+                FavouriteRecipe = favouriteRecipe,
+                MostUsedIngredient = mostUsedIngredient,
+                MoneySaved = moneySaved,
+                NumberOfIngredientsAdded = numberOfIngredientsAdded
+            };
+        }
+
+        private StatItem GetNumberOfIngredientsAdded(string userId)
+        {
+            var numberOfItemsAddedToFridge = _applicationDbContext.FridgeItems.Where(x => x.UserId == userId).Count();
+            return new StatItem()
+            {
+                Name = "Number of ingredients added",
+                Value = numberOfItemsAddedToFridge.ToString()
+            };
+        }
+
+        private StatItem GetMoneySavedStat(string userId)
+        {
+            var numberOfItemsAddedToFridge = _applicationDbContext.FridgeItems.Where(x => x.UserId == userId).Count();
+            return new StatItem()
+            {
+                Name = "Money Saved",
+                Value = $"£{numberOfItemsAddedToFridge}"
+            };
         }
 
         private StatItem GetMostUsedIngredientStat(string userId)
@@ -73,7 +106,7 @@ namespace FridgeCompanionV2Api.Application.Stats.Queries.GetStats
             var ingredientName = _applicationDbContext.Ingredients.FirstOrDefault(x => x.Id == mostUsedIngredient.IngredientId).Name;
             return new StatItem()
             {
-                Name = "Most used ingredient.",
+                Name = "Most used ingredient",
                 Value = ingredientName
             };
         }
