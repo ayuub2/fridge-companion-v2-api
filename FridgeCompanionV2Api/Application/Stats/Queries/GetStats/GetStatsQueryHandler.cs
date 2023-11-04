@@ -146,7 +146,7 @@ namespace FridgeCompanionV2Api.Application.Stats.Queries.GetStats
 
         private StatItem GetExpiredIngredientStat(string userId, DateTime dateDuringThisStatRound, DateTime dateDuringLastStatRound, string duration)
         {
-            var userFridgeItems = _applicationDbContext.FridgeItems.Where(x => !x.IsDeleted && x.UserId == userId);
+            var userFridgeItems = _applicationDbContext.FridgeItems.Where(x => !x.IsDeleted && x.UserId == userId && x.Expiration < DateTime.Now).ToList();
             if(!userFridgeItems.Any())
             {
                 return new StatItem()
@@ -155,7 +155,7 @@ namespace FridgeCompanionV2Api.Application.Stats.Queries.GetStats
                     Value = "0",
                 };
             }
-            var expiredStatDuringThisRound = userFridgeItems.Where(x => x.Expiration <= dateDuringThisStatRound).Count();
+            var expiredStatDuringThisRound = userFridgeItems.Where(x => x.Expiration >= dateDuringThisStatRound).Count();
             var expiredStatDuringLastRound = userFridgeItems.Where(x => x.Expiration >= dateDuringLastStatRound
                 && x.Expiration < dateDuringThisStatRound).Count();
             var isUp = expiredStatDuringThisRound >= expiredStatDuringLastRound;
