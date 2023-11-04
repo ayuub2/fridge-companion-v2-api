@@ -12,5 +12,6 @@ namespace FridgeCompanionV2Api.Domain.Entities
         public virtual List<UserDiets> UserDiets { get; set; }
         public virtual List<UserFavouriteRecipes> UserFavouriteRecipes { get; set; }
         public virtual List<UserMadeRecipes> UserMadeRecipes { get; set; }
+        public virtual List<Stat> Stats { get; set; }
     }
 }
