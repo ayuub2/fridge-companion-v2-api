@@ -1,6 +1,7 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes;
+using FridgeCompanionV2Api.Application.User.Commands.AddDeviceToken;
 using FridgeCompanionV2Api.Application.User.Commands.AddFavouriteRecipe;
 using FridgeCompanionV2Api.Application.User.Commands.AddMadeRecipe;
 using FridgeCompanionV2Api.Application.User.Commands.CreateUserProfile;
@@ -90,5 +91,13 @@ namespace FridgeCompanionV2Api.Controllers
             command.UserId = _currentUserService.UserId;
             await Mediator.Send(command);
         }
+
+        [HttpPost("Device/Register")]
+        public async Task<UserDto> AddDeviceToken(AddDeviceTokenCommand command)
+        {
+            command.UserId = _currentUserService.UserId;
+            return await Mediator.Send(command);
+        }
+
     }
 }

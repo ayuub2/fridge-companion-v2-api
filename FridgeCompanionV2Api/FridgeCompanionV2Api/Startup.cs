@@ -2,6 +2,7 @@ using FluentValidation.AspNetCore;
 using FridgeCompanionV2Api.Application;
 using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
+using FridgeCompanionV2Api.BackgroudService;
 using FridgeCompanionV2Api.Filters;
 using FridgeCompanionV2Api.Infrastructure;
 using FridgeCompanionV2Api.Infrastructure.Persistence;
@@ -45,7 +46,7 @@ namespace FridgeCompanionV2Api
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-
+            services.AddHostedService<NotificationService>();
             
 
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
