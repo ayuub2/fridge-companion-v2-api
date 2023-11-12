@@ -3,6 +3,7 @@ using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Application.User.Commands.AddFavouriteRecipe;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -33,7 +34,7 @@ namespace FridgeCompanionV2Api.Application.User.Commands.AddDeviceToken
 
             _logger.LogInformation("Updating device token for user {userId} to {deviceToken}", request.UserId, request.DeviceToken);
             
-            var user = _applicationDbContext.Users.FirstOrDefault(x => x.Id == request.UserId);
+            var user = _applicationDbContext.Users.Include(x => x.UserDiets).Include(x => x.UserMadeRecipes).Include(x => x.UserFavouriteRecipes).FirstOrDefault(x => x.Id == request.UserId);
             user.DeviceToken = request.DeviceToken;
             await _applicationDbContext.SaveChangesAsync(cancellationToken);
            
