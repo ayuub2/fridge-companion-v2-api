@@ -65,7 +65,12 @@ namespace FridgeCompanionV2Api.Infrastructure.Persistence
         }
         public IQueryable<FridgeItem> FreshFridgeItems(string userId)
         {
-            return FridgeItems.Include(x => x.Ingredient).Include(x=> x.Measurement).Include(x => x.IngredientLocation).Where(x => x.UserId == userId && !x.IsDeleted && DateTime.Now < x.Expiration).AsSplitQuery();
+            return FridgeItems.Include(x => x.IngredientLocation)
+                .Include(x => x.Ingredient)
+                    .ThenInclude(x => x.MeasurementTypes)
+                        .ThenInclude(x => x.Measurement)
+                .Include(x => x.Measurement)
+                .Include(x => x.IngredientLocation).Where(x => x.UserId == userId && !x.IsDeleted && DateTime.Now < x.Expiration).AsSplitQuery();
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
