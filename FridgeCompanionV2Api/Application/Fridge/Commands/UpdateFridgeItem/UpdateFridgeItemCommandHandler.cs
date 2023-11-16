@@ -33,7 +33,12 @@ namespace FridgeCompanionV2Api.Application.Fridge.Commands.UpdateFridgeItem
                 throw new ArgumentNullException(nameof(request));
             }
 
-            var entity = _applicationDbContext.FridgeItems.Include(x => x.Ingredient).Include(x => x.Measurement).Include(x => x.IngredientLocation).FirstOrDefault(x => x.Id == request.Id);
+            var entity = _applicationDbContext.FridgeItems.Include(x => x.IngredientLocation)
+                .Include(x => x.Ingredient)
+                    .ThenInclude(x => x.MeasurementTypes)
+                        .ThenInclude(x => x.Measurement)
+                .Include(x => x.Measurement)
+                .FirstOrDefault(x => x.Id == request.Id);
 
             if (entity is null)
             {

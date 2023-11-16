@@ -76,7 +76,11 @@ namespace FridgeCompanionV2Api.Application.Fridge.Commands.AddIngredientToFridge
                     var entity = _applicationDbContext.FridgeItems.Add(item);
 
                     await _applicationDbContext.SaveChangesAsync(cancellationToken);
-                    var attachedItem = _applicationDbContext.FridgeItems.Include(x => x.Ingredient).Include(x => x.Measurement).Include(x => x.IngredientLocation).FirstOrDefault(x => x.Id == entity.Entity.Id);
+                    var attachedItem = _applicationDbContext.FridgeItems.Include(x => x.IngredientLocation)
+                        .Include(x => x.Ingredient)
+                            .ThenInclude(x => x.MeasurementTypes)
+                                .ThenInclude(x => x.Measurement)
+                        .Include(x => x.Measurement).FirstOrDefault(x => x.Id == entity.Entity.Id);
 
 
                     return _mapper.Map<FridgeItemDto>(attachedItem);
