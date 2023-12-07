@@ -46,8 +46,9 @@ namespace FridgeCompanionV2Api
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-            services.AddHostedService<NotificationService>();
-            
+            services.AddHostedService<NotificationBackgroundService>();
+            services.AddScoped<IScopedProcessingService, ScopedNotificationService>();
+
 
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
 
