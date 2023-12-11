@@ -23,7 +23,7 @@ namespace FridgeCompanionV2Api.Infrastructure
             
 
             services.AddScoped<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
-
+            services.AddScoped<IElasticSearchService, ElasticSearchService>();
             services.AddTransient<IDateTime, DateTimeService>();
             services.AddTransient<ICsvFileBuilder, CsvFileBuilder>();
 

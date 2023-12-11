@@ -20,6 +20,7 @@ namespace FridgeCompanionV2Api.Application
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             services.Configure<AwsOptions>(configuration.GetSection(nameof(AwsOptions)));
+            services.Configure<ElasticOptions>(configuration.GetSection(nameof(ElasticOptions)));
             var barcodeOptions = configuration.GetSection(nameof(BarcodeOptions)).Get<BarcodeOptions>();
             services.AddHttpClient<IBarcodeClient, BarcodeClient>("BarcodeApi",
                 client =>
