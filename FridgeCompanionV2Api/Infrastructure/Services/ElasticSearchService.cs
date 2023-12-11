@@ -23,41 +23,47 @@ namespace FridgeCompanionV2Api.Infrastructure.Services
             var uri = new Uri(elastic.Value.Url);
             var settings = new ConnectionSettings(uri).EnableApiVersioningHeader();
             _elasticClient = new ElasticClient(settings);
-            //if (_elasticClient.Indices.Exists(RECIPE_INDEX).Exists)
-            //{
-                _elasticClient.Indices.Create(RECIPE_INDEX, x => x.Map<ElasticModelRequest>(m => m
+            if (_elasticClient.Indices.Exists(RECIPE_INDEX).Exists)
+            {
+                _elasticClient.Indices.CreateAsync(RECIPE_INDEX, c => c
+                .Map<ElasticModelRequest>(m => m
                     .AutoMap()
                     .Properties(ps => ps
-                        .Completion(c => c
-                            .Name(p => p.Suggest)))));
-            //}
+                        .Text(t => t
+                            .Name(p => p.Name) 
+                            .Analyzer("standard")
+                        )
+                    )
+                )
+                );
+            }
 
-            //if (_elasticClient.Indices.Exists(INGREDIENT_INDEX).Exists)
-            //{
-            var createIndexResponse = _elasticClient.Indices.Create(INGREDIENT_INDEX, c => c
-    .Map<ElasticModelRequest>(m => m
-        .AutoMap()
-        .Properties(ps => ps
-            .Text(t => t
-                .Name(p => p.Name)
-                .Analyzer("autocomplete")
-            )
-        )
-    )
-    .Settings(s => s
-        .Analysis(a => a
-            .TokenFilters(tf => tf.EdgeNGram("autocomplete", e => e
-                .MinGram(1)
-                .MaxGram(20)
-            ))
-            .Analyzers(an => an.Custom("autocomplete", ca => ca
-                .Tokenizer("standard")
-                .Filters("lowercase", "autocomplete")
-            ))
-        )
-    )
-);
-            //}
+            if (_elasticClient.Indices.Exists(INGREDIENT_INDEX).Exists)
+            {
+                _elasticClient.Indices.Create(INGREDIENT_INDEX, c => c
+                .Map<ElasticModelRequest>(m => m
+                    .AutoMap()
+                    .Properties(ps => ps
+                        .Text(t => t
+                            .Name(p => p.Name)
+                            .Analyzer("autocomplete")
+                        )
+                    )
+                )
+                .Settings(s => s
+                    .Analysis(a => a
+                        .TokenFilters(tf => tf.EdgeNGram("autocomplete", e => e
+                            .MinGram(1)
+                            .MaxGram(20)
+                        ))
+                        .Analyzers(an => an.Custom("autocomplete", ca => ca
+                            .Tokenizer("standard")
+                            .Filters("lowercase", "autocomplete")
+                        ))
+                    )
+                )
+                );
+            }
         }
 
         public async Task BulkIndexRecipesAsync(List<Recipe> recipes)
@@ -86,18 +92,15 @@ namespace FridgeCompanionV2Api.Infrastructure.Services
         public async Task<List<ElasticModelRequest>> SearchByRecipeNameAsync(string query)
         {
             var searchResponse = await _elasticClient.SearchAsync<ElasticModelRequest>(s => s
-                .Index(RECIPE_INDEX)
-                .Suggest(su => su
-                    .Completion("suggestions", c => c
-                        .Field(f => f.Suggest)
-                        .Prefix(query)
-                        .Fuzzy(f => f
-                            .Fuzziness(Fuzziness.Auto)
-                        )
-                        .Size(5))
-                        ));
-
-
+                 .Index(RECIPE_INDEX)
+                 .Query(q => q
+                     .Match(m => m
+                         .Field(f => f.Name)
+                         .Query(query)
+                     )
+                 )
+                 .Size(7)
+             );
             return searchResponse.Documents.ToList();
         }
 
@@ -106,11 +109,9 @@ namespace FridgeCompanionV2Api.Infrastructure.Services
             var searchResponse = await _elasticClient.SearchAsync<ElasticModelRequest>(s => s
                 .Index(INGREDIENT_INDEX)
                 .Query(q => q
-        .Prefix(p => p
-            .Field(f => f.Name)
-            .Value(query.ToLowerInvariant()) // Ensure consistent case for prefix matching
-        )
-    )
+                .Prefix(p => p
+                    .Field(f => f.Name)
+                    .Value(query.ToLowerInvariant())))
                 .Size(5)
             );
 
