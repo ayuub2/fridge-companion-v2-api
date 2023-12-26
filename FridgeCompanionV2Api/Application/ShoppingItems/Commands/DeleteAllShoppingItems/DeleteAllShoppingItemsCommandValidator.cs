@@ -10,8 +10,6 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.DeleteAllShopp
     {
         public DeleteAllShoppingItemsCommandValidator()
         {
-            RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User is not authorized.");
         }
     }
 }

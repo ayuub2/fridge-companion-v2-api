@@ -11,8 +11,6 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Queries.GetShoppingItem
     {
         public GetShoppingItemsCommandValidator()
         {
-            RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User is not authorized");
         }
     }
 }

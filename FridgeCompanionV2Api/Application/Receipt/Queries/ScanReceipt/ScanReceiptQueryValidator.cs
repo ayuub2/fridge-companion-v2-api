@@ -7,8 +7,6 @@ namespace FridgeCompanionV2Api.Application.Receipt.Queries.ScanReceipt
     {
         public ScanReceiptQueryValidator()
         {
-            RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User is not authorized.");
             RuleFor(x => x.Image)
                 .NotNull().WithMessage("Please upload an image.");
             RuleFor(x => x.Image)

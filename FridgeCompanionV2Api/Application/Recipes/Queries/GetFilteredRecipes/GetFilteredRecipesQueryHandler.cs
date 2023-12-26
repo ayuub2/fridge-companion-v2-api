@@ -53,7 +53,7 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes
             var recipes = _mapper.Map<List<RecipeDto>>(recipesEntites.ToList());
 
             // Filter using recipe name
-        recipes = _recipeService.FilterUsingRecipeName(request.RecipeName, recipes);
+            recipes = _recipeService.FilterUsingRecipeName(request.RecipeName, recipes);
 
             // Filter using diets
             recipes = _recipeService.FilterDiets(request.Diets, recipes);
