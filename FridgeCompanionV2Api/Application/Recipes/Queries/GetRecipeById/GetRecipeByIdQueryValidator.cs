@@ -10,8 +10,6 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipeById
     {
         public GetRecipeByIdQueryValidator()
         {
-            RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User is not authorized.");
             RuleFor(x => x.RecipeId)
                 .NotEmpty().WithMessage("Recipe id not supplied.");
         }

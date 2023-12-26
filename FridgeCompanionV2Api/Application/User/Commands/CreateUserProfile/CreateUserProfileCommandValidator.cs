@@ -10,8 +10,6 @@ namespace FridgeCompanionV2Api.Application.User.Commands.CreateUserProfile
     {
         public CreateUserProfileCommandValidator()
         {
-            RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User is not authorized");
         }
     }
 }

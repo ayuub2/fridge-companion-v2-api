@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Humanizer;
 
 namespace FridgeCompanionV2Api.Application.Fridge.Commands.UpdateFridgeItem
 {
@@ -66,8 +67,9 @@ namespace FridgeCompanionV2Api.Application.Fridge.Commands.UpdateFridgeItem
             entity.Amount = request.Amount;
             var updatedEntity = _applicationDbContext.FridgeItems.Update(entity);
             await _applicationDbContext.SaveChangesAsync(cancellationToken);
-
-            return _mapper.Map<FridgeItemDto>(updatedEntity.Entity);
+            var mappedItem = _mapper.Map<FridgeItemDto>(updatedEntity.Entity);
+            mappedItem.PrettyExpiration = mappedItem.Expiration.Humanize();
+            return mappedItem;
         }
     }
 }
