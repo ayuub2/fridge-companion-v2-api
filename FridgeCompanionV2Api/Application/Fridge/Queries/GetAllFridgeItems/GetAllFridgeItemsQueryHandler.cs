@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
+using Humanizer;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -42,7 +43,11 @@ namespace FridgeCompanionV2Api.Application.Fridge.Queries.GetAllFridgeItems
                 .Include(x => x.Measurement)
                 .Where(x => x.UserId == request.UserId && !x.IsDeleted)
                 .ToList();
-            return _mapper.Map<List<FridgeItemDto>>(items);
+            var mappedItems =  _mapper.Map<List<FridgeItemDto>>(items);
+
+            mappedItems.ForEach(x => x.PrettyExpiration = x.Expiration.Humanize());
+
+            return mappedItems;
         }
     }
 }
