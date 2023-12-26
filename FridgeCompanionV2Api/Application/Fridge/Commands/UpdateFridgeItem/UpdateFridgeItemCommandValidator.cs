@@ -11,8 +11,6 @@ namespace FridgeCompanionV2Api.Application.Fridge.Commands.UpdateFridgeItem
         public UpdateFridgeItemCommandValidator()
         {
             RuleFor(x => x.Id).NotEmpty().WithMessage("You must provide the Id of the fridge item.");
-            RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User is not authorized.");
 
         }
     }

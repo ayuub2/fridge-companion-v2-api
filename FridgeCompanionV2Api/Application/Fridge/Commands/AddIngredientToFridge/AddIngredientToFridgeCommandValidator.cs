@@ -15,8 +15,6 @@ namespace FridgeCompanionV2Api.Application.Fridge.Commands.AddIngredientToFridge
             RuleFor(x => x.IngredientId).NotEmpty().WithMessage("Please supply a valid ingredientId.");
             RuleFor(x => x.MeasurementId).NotEmpty().WithMessage("Please supply a valid measurementId.");
             RuleFor(x => x.LocationId).NotEmpty().WithMessage("Please supply a valid locationId.");
-            RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User is not authorized.");
         }
     }
 }

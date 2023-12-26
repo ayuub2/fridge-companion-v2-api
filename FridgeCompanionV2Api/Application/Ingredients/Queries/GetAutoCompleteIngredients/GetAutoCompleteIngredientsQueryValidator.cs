@@ -11,8 +11,6 @@ namespace FridgeCompanionV2Api.Application.Ingredients.Queries.GetAutoCompleteIn
         public GetAutoCompleteIngredientsQueryValidator()
         {
             RuleFor(x => x.Query).NotEmpty().WithMessage("Query cannot be empty.");
-            RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User is not authorized.");
         }
     }
 }

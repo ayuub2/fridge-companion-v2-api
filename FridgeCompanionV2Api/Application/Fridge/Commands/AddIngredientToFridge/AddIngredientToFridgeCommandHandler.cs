@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Humanizer;
 
 namespace FridgeCompanionV2Api.Application.Fridge.Commands.AddIngredientToFridge
 {
@@ -69,7 +70,9 @@ namespace FridgeCompanionV2Api.Application.Fridge.Commands.AddIngredientToFridge
                     }
                     await _applicationDbContext.SaveChangesAsync(cancellationToken);
                     var updatedItem = _applicationDbContext.FreshFridgeItems(request.UserId).FirstOrDefault(x => request.IngredientId == x.IngredientId);
-                    return _mapper.Map<FridgeItemDto>(updatedItem);
+                    var mappedItem =  _mapper.Map<FridgeItemDto>(updatedItem);
+                    mappedItem.PrettyExpiration = mappedItem.Expiration.Humanize();
+                    return mappedItem;
                 }
                 else 
                 {
@@ -82,8 +85,9 @@ namespace FridgeCompanionV2Api.Application.Fridge.Commands.AddIngredientToFridge
                                 .ThenInclude(x => x.Measurement)
                         .Include(x => x.Measurement).FirstOrDefault(x => x.Id == entity.Entity.Id);
 
-
-                    return _mapper.Map<FridgeItemDto>(attachedItem);
+                    var mappedItem = _mapper.Map<FridgeItemDto>(attachedItem);
+                    mappedItem.PrettyExpiration = mappedItem.Expiration.Humanize();
+                    return mappedItem;
                 }
                
             }

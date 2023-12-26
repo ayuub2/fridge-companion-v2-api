@@ -10,8 +10,6 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.CreateShopping
     {
         public CreateShoppingItemCommandValidator()
         {
-            RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User is not authorized.");
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage("Item name cannot be empty.");
         }
