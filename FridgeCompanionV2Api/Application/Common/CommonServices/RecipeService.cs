@@ -172,6 +172,12 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
             return recipes;
         }
 
+        public RecipeDto PopulateUserFavourites(List<UserFavouriteRecipes> favourites, RecipeDto recipe)
+        {
+            recipe.isFavourited = favourites.Any(x => x.RecipeId == recipe.Id);
+            return recipe;
+        }
+
         public List<RecipeDto> CalculateNutrition(List<RecipeDto> recipes)
         {
             foreach (var recipe in recipes)
