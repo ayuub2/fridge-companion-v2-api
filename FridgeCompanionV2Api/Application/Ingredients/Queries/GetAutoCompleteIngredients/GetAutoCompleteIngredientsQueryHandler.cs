@@ -19,12 +19,14 @@ namespace FridgeCompanionV2Api.Application.Ingredients.Queries.GetAutoCompleteIn
         private readonly IApplicationDbContext _applicationDbContext;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
+        private readonly IElasticSearchService _elasticsearchService;
 
-        public GetAutoCompleteIngredientsQueryHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<GetAutoCompleteIngredientsQueryHandler> logger)
+        public GetAutoCompleteIngredientsQueryHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<GetAutoCompleteIngredientsQueryHandler> logger, IElasticSearchService elasticSearchService)
         {
             _applicationDbContext = applicationDbContext ?? throw new ArgumentNullException(nameof(applicationDbContext));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _elasticsearchService = elasticSearchService ?? throw new ArgumentNullException(nameof(_elasticsearchService));
         }
 
         public async Task<List<IngredientDto>> Handle(GetAutoCompleteIngredientsQuery request, CancellationToken cancellationToken)
@@ -41,16 +43,15 @@ namespace FridgeCompanionV2Api.Application.Ingredients.Queries.GetAutoCompleteIn
                     .ThenInclude(idt => idt.IngredientGroupType)
                 .Include(x => x.MeasurementTypes)
                     .ThenInclude(idt => idt.Measurement)
-                .Where(x => !x.IsDeleted).AsNoTracking().ToList();
-           
-            var matches = ingredients
-            .Select(ingredient => new { Ingredient = ingredient, Score = ingredient.Name.ToLower().JaroWinklerDistance(request.Query.ToLower()) })
-            .OrderByDescending(match => match.Score)
-            .Where(match => match.Score >= 0.7)
-            .Take(10)
-            .Select(x => x.Ingredient)
-            .ToList();
+                .Where(x => !x.IsDeleted);
 
+            var elasticModels = await _elasticsearchService.SearchByIngredientNameAsync(request.Query);
+
+            var matches = new List<Ingredient>();
+            foreach (var elasticModel in elasticModels)
+            {
+                matches.Add(ingredients.FirstOrDefault(x => x.Id  == elasticModel.Id));
+            }
             return _mapper.Map<List<IngredientDto>>(matches);
         }
     }

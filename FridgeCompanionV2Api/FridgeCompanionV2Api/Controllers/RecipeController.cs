@@ -1,5 +1,6 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
+using FridgeCompanionV2Api.Application.Recipes.Commands.IndexRecipes;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipeById;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipeByServingSize;
@@ -75,6 +76,15 @@ namespace FridgeCompanionV2Api.Controllers
             query.UserId = _currentUserService.UserId;
             return await Mediator.Send(query);
         }
+
+        [HttpPost("IndexRecipes")]
+        public async Task<ActionResult> IndexRecipes()
+        {
+            IndexRecipesCommand command = new IndexRecipesCommand();
+            await Mediator.Send(command);
+            return Ok();
+        }
+
 
 
     }

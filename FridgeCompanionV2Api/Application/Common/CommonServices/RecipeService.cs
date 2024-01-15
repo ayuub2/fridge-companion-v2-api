@@ -16,11 +16,13 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
         private readonly IConverterService _converterService;
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
-        public RecipeService(IConverterService converterService, IApplicationDbContext context, IMapper mapper)
+        private readonly IElasticSearchService _elasticsearchService;
+        public RecipeService(IConverterService converterService, IApplicationDbContext context, IMapper mapper, IElasticSearchService elasticSearchService)
         {
             _converterService = converterService ?? throw new ArgumentNullException(nameof(converterService));
             _context = context;
             _mapper = mapper;
+            _elasticsearchService = elasticSearchService;
         }
         public List<RecipeDto> FilterDiets(List<int> diets, List<RecipeDto> recipes)
         {
@@ -32,19 +34,13 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
             return recipes;
         }
 
-        public List<RecipeDto> FilterUsingRecipeName(string recipeName, List<RecipeDto> recipes)
+        public async Task<List<RecipeDto>> FilterUsingRecipeNameAsync(string recipeName, List<RecipeDto> recipes)
         {
             if (!string.IsNullOrEmpty(recipeName))
             {
-                var matches = recipes
-                    .Select(recipe => new { Recipe = recipe, Score = recipe.Name.ToLower().JaroWinklerDistance(recipeName.ToLower()) })
-                    .OrderByDescending(match => match.Score)
-                    .Where(match => match.Score >= 0.5)
-                    .Take(10)
-                    .Select(x => x.Recipe)
-                    .ToList();
+                var elasticModel = await _elasticsearchService.SearchByRecipeNameAsync(recipeName);
 
-                recipes = matches;
+                recipes = recipes.Where(x => elasticModel.Any(e => e.Id == x.Id)).ToList();
             }
 
             return recipes;
