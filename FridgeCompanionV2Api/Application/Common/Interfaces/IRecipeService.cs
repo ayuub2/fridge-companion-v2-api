@@ -4,13 +4,14 @@ using FridgeCompanionV2Api.Application.Recipes.Queries.GetFilteredRecipes;
 using FridgeCompanionV2Api.Domain.Entities;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FridgeCompanionV2Api.Application.Common.Interfaces
 {
     public interface IRecipeService
     {
         List<RecipeDto> FilterDiets(List<int> diets, List<RecipeDto> recipes);
-        List<RecipeDto> FilterUsingRecipeName(string recipeName, List<RecipeDto> recipes);
+        Task<List<RecipeDto>> FilterUsingRecipeNameAsync(string recipeName, List<RecipeDto> recipes);
         IQueryable<Recipe> ExcludeRecipes(List<int> recipesToExclude, IQueryable<Recipe> recipesEntites);
         List<RecipeDto> FilterUsingRecipeByName(string recipeBy, List<RecipeDto> recipes);
         List<RecipeDto> FilterDishTypes(List<int> dishTypes, List<RecipeDto> recipes);

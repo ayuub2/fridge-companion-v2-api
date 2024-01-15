@@ -20,10 +20,11 @@ namespace FridgeCompanionV2Api.Infrastructure
                 .UseSqlServer(
                     configuration.GetConnectionString("FridgeCompanionApi"),
                     b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
-            
 
+            services.AddHostedService<ElasticIndexBackgroundService>();
+            services.AddScoped<IScopedProcessingService, ScopedElasticIndexBackgroundService>();
             services.AddScoped<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
-
+            services.AddScoped<IElasticSearchService, ElasticSearchService>();
             services.AddTransient<IDateTime, DateTimeService>();
             services.AddTransient<ICsvFileBuilder, CsvFileBuilder>();
 

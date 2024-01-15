@@ -32,9 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Ingredients\Commands\" />
     <Folder Include="Receipt\Commands\" />
-    <Folder Include="Recipes\Commands\" />
     <Folder Include="ShoppingLists\Queries\" />
     <Folder Include="Suggestions\Commands\" />
   </ItemGroup>

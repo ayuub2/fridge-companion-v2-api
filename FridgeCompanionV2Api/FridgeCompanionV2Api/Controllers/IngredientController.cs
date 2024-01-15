@@ -1,7 +1,9 @@
 ﻿using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
+using FridgeCompanionV2Api.Application.Ingredients.Commands.IndexIngredients;
 using FridgeCompanionV2Api.Application.Ingredients.Queries.GetAutoCompleteIngredients;
 using FridgeCompanionV2Api.Application.Ingredients.Queries.GetIngredientsByName;
+using FridgeCompanionV2Api.Application.Recipes.Commands.IndexRecipes;
 using FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -46,6 +48,13 @@ namespace FridgeCompanionV2Api.Controllers
             return await Mediator.Send(query);
         }
 
+        [HttpPost("IndexIngredients")]
+        public async Task<ActionResult> IndexIngredients()
+        {
+            IndexIngredientsCommand command = new IndexIngredientsCommand();
+            await Mediator.Send(command);
+            return Ok();
+        }
 
     }
 }
