@@ -1,5 +1,4 @@
-﻿using Nest;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +10,5 @@ namespace FridgeCompanionV2Api.Application.Common.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public CompletionField Suggest { get; set; }
     }
 }

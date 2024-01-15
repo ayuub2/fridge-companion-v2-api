@@ -34,7 +34,7 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipeById
                 throw new ArgumentNullException(nameof(request));
             }
             var recipe = _applicationDbContext.GetRecipesWithDetails().FirstOrDefault(x => x.Id == request.RecipeId);
-            var recipeDto = _mapper.Map<RecipeDto>(recipe);
+            var recipeDto = _mapper.Map<RecipeDto>(recipe); 
             if (recipe is null) throw new NotFoundException("Recipe not found.");
             return _recipeService.OrderRecipesByIngredients(_applicationDbContext.FreshFridgeItems(request.UserId).Select(x => x.IngredientId).ToList(), new List<RecipeDto>() { recipeDto }).FirstOrDefault();
         }

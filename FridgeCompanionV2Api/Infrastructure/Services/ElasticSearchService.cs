@@ -3,7 +3,7 @@ using FridgeCompanionV2Api.Application.Common.Models;
 using FridgeCompanionV2Api.Application.Common.Options;
 using FridgeCompanionV2Api.Domain.Entities;
 using Microsoft.Extensions.Options;
-using Nest;
+using OpenSearch.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,15 +14,15 @@ namespace FridgeCompanionV2Api.Infrastructure.Services
 {
     public class ElasticSearchService : IElasticSearchService
     {
-        private readonly ElasticClient _elasticClient;
+        private readonly OpenSearchClient _elasticClient;
         private const string RECIPE_INDEX = "recipes";
         private const string INGREDIENT_INDEX = "ingredients";
 
         public ElasticSearchService(IOptions<ElasticOptions> elastic)
         {
             var uri = new Uri(elastic.Value.Url);
-            var settings = new ConnectionSettings(uri).EnableApiVersioningHeader();
-            _elasticClient = new ElasticClient(settings);
+            var settings = new ConnectionSettings(uri).BasicAuthentication("admin", "uz9Y5cRMt%bVb6");
+            _elasticClient = new OpenSearchClient(settings);
             if (_elasticClient.Indices.Exists(RECIPE_INDEX).Exists)
             {
                 _elasticClient.Indices.CreateAsync(RECIPE_INDEX, c => c
