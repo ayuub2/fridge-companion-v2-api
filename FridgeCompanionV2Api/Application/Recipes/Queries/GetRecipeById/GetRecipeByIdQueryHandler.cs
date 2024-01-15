@@ -3,6 +3,7 @@ using FridgeCompanionV2Api.Application.Common.Exceptions;
 using FridgeCompanionV2Api.Application.Common.Interfaces;
 using FridgeCompanionV2Api.Application.Common.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -34,8 +35,13 @@ namespace FridgeCompanionV2Api.Application.Recipes.Queries.GetRecipeById
                 throw new ArgumentNullException(nameof(request));
             }
             var recipe = _applicationDbContext.GetRecipesWithDetails().FirstOrDefault(x => x.Id == request.RecipeId);
-            var recipeDto = _mapper.Map<RecipeDto>(recipe); 
+            var user = _applicationDbContext.Users
+                .Include(x => x.UserFavouriteRecipes)
+                .FirstOrDefault(x => x.Id == request.UserId);
+
+            var recipeDto = _mapper.Map<RecipeDto>(recipe);
             if (recipe is null) throw new NotFoundException("Recipe not found.");
+            recipeDto = _recipeService.PopulateUserFavourites(user.UserFavouriteRecipes, recipeDto);
             return _recipeService.OrderRecipesByIngredients(_applicationDbContext.FreshFridgeItems(request.UserId).Select(x => x.IngredientId).ToList(), new List<RecipeDto>() { recipeDto }).FirstOrDefault();
         }
     }

@@ -10,8 +10,6 @@ namespace FridgeCompanionV2Api.Application.Receipt.Queries.ScanBarcode
     {
         public ScanBarcodeQueryValidator()
         {
-            RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User is not authorized.");
             RuleFor(x => x.EAN)
                 .NotNull().WithMessage("Please supply a EAN Barcode.");
         }

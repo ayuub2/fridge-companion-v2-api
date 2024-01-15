@@ -11,8 +11,6 @@ namespace FridgeCompanionV2Api.Application.ShoppingLists.Commands.CreateShopping
     {
         public CreateShoppingListCommandValidator()
         {
-            RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User is not authorized");
         }
     }
 }

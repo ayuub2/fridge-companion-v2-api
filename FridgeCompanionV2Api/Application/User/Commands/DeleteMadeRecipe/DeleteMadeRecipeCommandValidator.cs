@@ -10,8 +10,6 @@ namespace FridgeCompanionV2Api.Application.User.Commands.DeleteMadeRecipe
     {
         public DeleteMadeRecipeCommandValidator()
         {
-            RuleFor(x => x.UserId)
-                   .NotEmpty().WithMessage("User is not authorized");
             RuleFor(x => x.RecipeId)
                 .NotEmpty().WithMessage("Please supply a recipe id.");
         }

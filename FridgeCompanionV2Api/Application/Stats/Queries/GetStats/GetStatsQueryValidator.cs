@@ -6,7 +6,6 @@ namespace FridgeCompanionV2Api.Application.Stats.Queries.GetStats
     {
         public GetStatsQueryValidator() 
         {
-            RuleFor(x => x.UserId).NotEmpty().WithMessage("User Id not provided.");
             RuleFor(x => x.Duration).NotEmpty().WithMessage("Stat duration must not be empty.");
         }
     }

@@ -10,8 +10,6 @@ namespace FridgeCompanionV2Api.Application.Ingredients.Queries.GetIngredientsByN
     {
         public GetIngredientByNameQueryValidator()
         {
-            RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User is not authorized.");
             RuleFor(x => x.IngredientNames).NotEmpty().WithMessage("At least one ingredient name has to be supplied.");
         }
     }
