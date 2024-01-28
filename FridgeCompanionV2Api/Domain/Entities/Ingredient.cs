@@ -21,7 +21,7 @@ namespace FridgeCompanionV2Api.Domain.Entities
         public bool IsGlutenFree { get; set; }
         public bool IsNutFree { get; set; }
         public bool IsDeleted { get; set; }
-
+        public string ImageUrl { get; set; }
         public virtual IngredientLocation Location { get; set; }
 
         public virtual List<IngredientDiet> DietTypes { get; set; }
