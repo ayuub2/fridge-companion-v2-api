@@ -94,11 +94,20 @@ namespace FridgeCompanionV2Api.Infrastructure.Services
             var searchResponse = await _elasticClient.SearchAsync<ElasticModelRequest>(s => s
                  .Index(RECIPE_INDEX)
                  .Query(q => q
-                     .Match(m => m
-                         .Field(f => f.Name)
-                         .Query(query)
-                     )
-                 )
+                    .Bool(b => b
+                        .Should(sh => sh
+                            .Match(m => m
+                                .Field(f => f.Name)
+                                .Query(query.ToLowerInvariant())
+                            ),
+                            sh => sh
+                            .Prefix(p => p
+                                .Field(f => f.Name)
+                                .Value(query.ToLowerInvariant())
+                            )
+                        )
+                    )
+                )
                  .Size(7)
              );
             return searchResponse.Documents.ToList();
@@ -109,9 +118,20 @@ namespace FridgeCompanionV2Api.Infrastructure.Services
             var searchResponse = await _elasticClient.SearchAsync<ElasticModelRequest>(s => s
                 .Index(INGREDIENT_INDEX)
                 .Query(q => q
-                .Prefix(p => p
-                    .Field(f => f.Name)
-                    .Value(query.ToLowerInvariant())))
+                    .Bool(b => b
+                        .Should(sh => sh
+                            .Match(m => m
+                                .Field(f => f.Name)
+                                .Query(query.ToLowerInvariant())
+                            ),
+                            sh => sh
+                            .Prefix(p => p
+                                .Field(f => f.Name)
+                                .Value(query.ToLowerInvariant())
+                            )
+                        )
+                    )
+                )
                 .Size(5)
             );
 
