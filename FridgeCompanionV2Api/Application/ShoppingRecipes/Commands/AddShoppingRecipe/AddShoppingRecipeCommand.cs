@@ -7,5 +7,6 @@ namespace FridgeCompanionV2Api.Application.ShoppingRecipes.Commands.AddShoppingR
     {
         public string UserId { get; set; }
         public int RecipeId { get; set; }
+        public int ServingSize { get; set; }
     }
 }

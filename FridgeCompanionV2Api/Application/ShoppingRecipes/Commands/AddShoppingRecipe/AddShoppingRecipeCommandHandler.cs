@@ -18,12 +18,14 @@ namespace FridgeCompanionV2Api.Application.ShoppingRecipes.Commands.AddShoppingR
         private readonly IApplicationDbContext _applicationDbContext;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
+        private readonly IRecipeService _recipeService;
 
-        public AddShoppingRecipeCommandHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<AddShoppingRecipeCommandHandler> logger)
+        public AddShoppingRecipeCommandHandler(IApplicationDbContext applicationDbContext, IMapper mapper, ILogger<AddShoppingRecipeCommandHandler> logger, IRecipeService recipeService)
         {
             _applicationDbContext = applicationDbContext ?? throw new ArgumentNullException(nameof(applicationDbContext));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _recipeService = recipeService;
         }
 
         public async Task<ShoppingListRecipeDto> Handle(AddShoppingRecipeCommand request, CancellationToken cancellationToken)
@@ -42,7 +44,13 @@ namespace FridgeCompanionV2Api.Application.ShoppingRecipes.Commands.AddShoppingR
                 .AsNoTracking()
                 .Include(x => x.Ingredients)
                     .ThenInclude(x => x.Measurement)
+                .Include(x => x.Ingredients)
+                    .ThenInclude(x => x.Ingredient)
                 .FirstOrDefaultAsync(x => x.Id == request.RecipeId);
+
+            var recipeDto = _mapper.Map<RecipeDto>(recipe);
+
+            if (recipeDto.Servings != request.ServingSize) recipeDto = _recipeService.GetRecipeInServingSizeWithoutNutrition(request.ServingSize, recipeDto);
 
             var shoppingListRecipe = _applicationDbContext.ShoppingListRecipeItem.Add(new ShoppingListRecipeItem() 
             {
@@ -52,38 +60,25 @@ namespace FridgeCompanionV2Api.Application.ShoppingRecipes.Commands.AddShoppingR
 
 
             // get recipe and add each item to the database, combine ingredients if they existr in the shopping list
-            foreach(var ingredient in recipe.Ingredients)
+            foreach(var ingredient in recipeDto.Ingredients)
             {
-                var ingredientAlreadyExists = shoppingList.Items.FirstOrDefault(x => x.IngredientId == ingredient.IngredientId);
+                var ingredientAlreadyExists = shoppingList.Items.FirstOrDefault(x => x.IngredientId == ingredient.Ingredient.Id);
                 if (ingredientAlreadyExists is not null)
                 {
                     // if the ingredients have the same measurment then just add the amounts.
-                    if(ingredientAlreadyExists.MeasurementId == ingredient.MeasurementId)
+                    if(ingredientAlreadyExists.MeasurementId == ingredient.Measurement.Id)
                     {
-                        _applicationDbContext.ShoppingListItem.Add(new ShoppingListItem()
-                        {
-                            Id = Guid.NewGuid(),
-                            Amount = ingredient.Amount + ingredientAlreadyExists.Amount,
-                            MeasurementId = ingredient.MeasurementId,
-                            IngredientId = ingredient.IngredientId,
-                            ShoppingListId = shoppingList.Id
-                        });
+                        ingredientAlreadyExists.Amount = ingredientAlreadyExists.Amount + ingredient.Amount;
                     } else
                     {
                         // if measurements are different convert to grams and then add them together 
-                        var newIngredientConverter = _applicationDbContext.IngredientMeasurements.FirstOrDefault(x => x.IngredientId == ingredient.IngredientId && x.MeasurementId == ingredient.MeasurementId);
+                        var newIngredientConverter = _applicationDbContext.IngredientMeasurements.FirstOrDefault(x => x.IngredientId == ingredient.Ingredient.Id && x.MeasurementId == ingredient.Measurement.Id);
                         var oldIngredientConverter = _applicationDbContext.IngredientMeasurements.FirstOrDefault(x => x.IngredientId == ingredientAlreadyExists.IngredientId && x.MeasurementId == ingredientAlreadyExists.MeasurementId);
                         var newIngredientGrams = ConvertMeasurementToGrams(newIngredientConverter, ingredient.Amount, ingredient.Measurement);
-                        var oldIngredientGrams = ConvertMeasurementToGrams(oldIngredientConverter, ingredientAlreadyExists.Amount, ingredientAlreadyExists.Measurement);
+                        var oldIngredientGrams = ConvertMeasurementToGrams(oldIngredientConverter, ingredientAlreadyExists.Amount, _mapper.Map<MeasurementTypeDto>(ingredientAlreadyExists.Measurement));
 
-                        _applicationDbContext.ShoppingListItem.Add(new ShoppingListItem()
-                        {
-                            Id = Guid.NewGuid(),
-                            Amount = newIngredientGrams + oldIngredientGrams,
-                            MeasurementId = 3,
-                            IngredientId = ingredient.IngredientId,
-                            ShoppingListId = shoppingList.Id
-                        });
+                        ingredientAlreadyExists.Amount = newIngredientGrams + oldIngredientGrams;
+                        ingredientAlreadyExists.MeasurementId = 3;
                     }
                 } else
                 {
@@ -91,8 +86,8 @@ namespace FridgeCompanionV2Api.Application.ShoppingRecipes.Commands.AddShoppingR
                     {
                         Id = Guid.NewGuid(),
                         Amount = ingredient.Amount,
-                        MeasurementId = ingredient.MeasurementId,
-                        IngredientId = ingredient.IngredientId,
+                        MeasurementId = ingredient.Measurement.Id,
+                        IngredientId = ingredient.Ingredient.Id,
                         ShoppingListId = shoppingList.Id
                     });
                 }
@@ -105,7 +100,7 @@ namespace FridgeCompanionV2Api.Application.ShoppingRecipes.Commands.AddShoppingR
             return _mapper.Map<ShoppingListRecipeDto>(shoppingListRecipe.Entity);
         }
 
-        private decimal ConvertMeasurementToGrams(IngredientMeasurement ingredientMeasurement, decimal amount, MeasurementType measurement)
+        private decimal ConvertMeasurementToGrams(IngredientMeasurement ingredientMeasurement, decimal amount, MeasurementTypeDto measurement)
         {
             decimal grams;
             if (ingredientMeasurement.AverageGrams is not null)

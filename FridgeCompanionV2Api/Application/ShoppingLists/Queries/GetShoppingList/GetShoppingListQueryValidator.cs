@@ -6,7 +6,6 @@ namespace FridgeCompanionV2Api.Application.ShoppingLists.Queries.GetShoppingList
     {
         public GetShoppingListQueryValidator()
         {
-            RuleFor(x => x.UserId).NotEmpty().WithMessage("User is not authorised.");
         }
     }
 }

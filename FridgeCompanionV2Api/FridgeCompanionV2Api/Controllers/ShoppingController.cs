@@ -5,6 +5,7 @@ using FridgeCompanionV2Api.Application.ShoppingItems.Commands.DeleteAllShoppingI
 using FridgeCompanionV2Api.Application.ShoppingItems.Commands.DeleteShoppingItem;
 using FridgeCompanionV2Api.Application.ShoppingItems.Commands.UpdateShoppingItem;
 using FridgeCompanionV2Api.Application.ShoppingItems.Queries.GetShoppingItems;
+using FridgeCompanionV2Api.Application.ShoppingLists.Commands.ClearShoppingList;
 using FridgeCompanionV2Api.Application.ShoppingLists.Commands.CreateShoppingList;
 using FridgeCompanionV2Api.Application.ShoppingLists.Queries.GetShoppingList;
 using FridgeCompanionV2Api.Application.ShoppingRecipes.Commands.AddShoppingRecipe;
@@ -48,6 +49,13 @@ namespace FridgeCompanionV2Api.Controllers
             GetShoppingListQuery query = new GetShoppingListQuery();
             query.UserId = _currentUserService.UserId;
             return await Mediator.Send(query);
+        }
+
+        [HttpDelete("ListAll")]
+        public async Task<ActionResult<Unit>> DeleteListAll(ClearShoppingListCommand command)
+        {
+            command.UserId = _currentUserService.UserId;
+            return await Mediator.Send(command);
         }
 
         [HttpGet("Item")]

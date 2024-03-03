@@ -12,18 +12,18 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.CreateShopping
     public class CreateShoppingItemCommandValidator : AbstractValidator<CreateShoppingItemCommand>
     {
         private readonly IApplicationDbContext _applicationDbContext;
-        public CreateShoppingItemCommandValidator(IApplicationDbContext applicationDbContext)
+        private readonly ICurrentUserService _currentUserService;
+        public CreateShoppingItemCommandValidator(IApplicationDbContext applicationDbContext, ICurrentUserService currentUserService)
         {
             _applicationDbContext = applicationDbContext;
-            RuleFor(x => x.UserId).NotEmpty().WithMessage("User is not authorised.");
+            _currentUserService = currentUserService;
 
             RuleFor(x => x.MeasurementId)
                 .NotEmpty().WithMessage("Item must have a measurement.")
                 .MustAsync(MeasurementTypeExists).WithMessage("Measurement type does not exist.");
             RuleFor(x => x.IngredientId)
-                .MustAsync(IngredientExists).WithMessage("Ingredient does not exist.");
-            RuleFor(x => new { x.IngredientId, x.UserId })
-                .MustAsync((command, properties, cancellationToken) => ItemNotExists(command.IngredientId, command.UserId, cancellationToken)).WithMessage("Ingredient already exists in your shopping list, please update ingredient instead.");
+                .MustAsync(IngredientExists).WithMessage("Ingredient does not exist.")
+                .MustAsync((command, properties, cancellationToken) => ItemNotExists(command.IngredientId, _currentUserService.UserId, cancellationToken)).WithMessage("Ingredient already exists in your shopping list, please update ingredient instead.");
         }
 
         private async Task<bool> MeasurementTypeExists(int measurementId, CancellationToken cancellationToken)
