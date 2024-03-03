@@ -7,6 +7,7 @@ using FridgeCompanionV2Api.Application.ShoppingItems.Commands.UpdateShoppingItem
 using FridgeCompanionV2Api.Application.ShoppingItems.Queries.GetShoppingItems;
 using FridgeCompanionV2Api.Application.ShoppingLists.Commands.CreateShoppingList;
 using FridgeCompanionV2Api.Application.ShoppingLists.Queries.GetShoppingList;
+using FridgeCompanionV2Api.Application.ShoppingRecipes.Commands.AddShoppingRecipe;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -53,6 +54,13 @@ namespace FridgeCompanionV2Api.Controllers
         public async Task<ActionResult<List<ShoppingItemDto>>> GetItems()
         {
             GetShoppingItemsCommand command = new GetShoppingItemsCommand();
+            command.UserId = _currentUserService.UserId;
+            return await Mediator.Send(command);
+        }
+
+        [HttpPost("Recipe")]
+        public async Task<ActionResult<ShoppingListRecipeDto>> CreateRecipe(AddShoppingRecipeCommand command)
+        {
             command.UserId = _currentUserService.UserId;
             return await Mediator.Send(command);
         }

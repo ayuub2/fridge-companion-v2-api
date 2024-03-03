@@ -8,6 +8,7 @@ namespace FridgeCompanionV2Api.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Recipe> builder)
         {
+            builder.HasQueryFilter(item => !item.IsDeleted);
         }
     }
 }

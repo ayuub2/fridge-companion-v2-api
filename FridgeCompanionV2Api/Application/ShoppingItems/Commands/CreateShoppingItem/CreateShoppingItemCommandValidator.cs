@@ -15,6 +15,7 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.CreateShopping
         public CreateShoppingItemCommandValidator(IApplicationDbContext applicationDbContext)
         {
             _applicationDbContext = applicationDbContext;
+            RuleFor(x => x.UserId).NotEmpty().WithMessage("User is not authorised.");
 
             RuleFor(x => x.MeasurementId)
                 .NotEmpty().WithMessage("Item must have a measurement.")
