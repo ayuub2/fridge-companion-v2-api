@@ -9,5 +9,7 @@ namespace FridgeCompanionV2Api.Application.Common.Models
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public List<ShoppingItemDto> Items { get; set; }
+        public List<ShoppingListRecipeDto> Recipes { get; set; }
     }
 }

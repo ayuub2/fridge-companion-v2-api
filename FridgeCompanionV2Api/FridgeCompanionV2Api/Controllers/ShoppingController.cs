@@ -6,6 +6,7 @@ using FridgeCompanionV2Api.Application.ShoppingItems.Commands.DeleteShoppingItem
 using FridgeCompanionV2Api.Application.ShoppingItems.Commands.UpdateShoppingItem;
 using FridgeCompanionV2Api.Application.ShoppingItems.Queries.GetShoppingItems;
 using FridgeCompanionV2Api.Application.ShoppingLists.Commands.CreateShoppingList;
+using FridgeCompanionV2Api.Application.ShoppingLists.Queries.GetShoppingList;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -37,6 +38,14 @@ namespace FridgeCompanionV2Api.Controllers
             // create list
             command.UserId = _currentUserService.UserId;
             return await Mediator.Send(command);
+        }
+
+        [HttpGet("List")]
+        public async Task<ActionResult<ShoppingListDto>> GetList()
+        {
+            GetShoppingListQuery query = new GetShoppingListQuery();
+            query.UserId = _currentUserService.UserId;
+            return await Mediator.Send(query);
         }
 
         [HttpGet("Item")]

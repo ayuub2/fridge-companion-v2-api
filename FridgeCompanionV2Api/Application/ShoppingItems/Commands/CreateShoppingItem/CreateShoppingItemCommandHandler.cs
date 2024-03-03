@@ -47,7 +47,7 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.CreateShopping
 
                 var addedItem = _applicationDbContext.ShoppingListItem.Add(new Domain.Entities.ShoppingListItem() 
                 {
-                    Name = request.Name,
+                    //Name = request.Name,
                     IsChecked = false,
                     IsDeleted = false,
                     ShoppingList = shoppingList,

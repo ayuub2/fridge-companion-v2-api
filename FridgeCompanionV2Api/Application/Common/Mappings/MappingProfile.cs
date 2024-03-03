@@ -14,7 +14,12 @@ namespace FridgeCompanionV2Api.Application.Common.Mappings
         {
             ApplyMappingsFromAssembly(Assembly.GetExecutingAssembly());
             CreateMap<ShoppingList, ShoppingListDto>();
-            CreateMap<ShoppingListItem, ShoppingItemDto>();
+            CreateMap<ShoppingListItem, ShoppingItemDto>()
+                .ForMember(dest => dest.Measurement, opt => opt.MapFrom(src => src.Measurement.Name))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Ingredient.Name));
+            CreateMap<ShoppingListRecipeItem, ShoppingListRecipeDto>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Recipe.Name));
+
             CreateMap<MeasurementType, MeasurementTypeDto>();
             CreateMap<IngredientMeasurement, IngredientMeasurementTypeDto>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Measurement.Id))
