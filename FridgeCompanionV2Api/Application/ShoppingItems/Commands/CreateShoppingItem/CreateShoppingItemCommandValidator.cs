@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FridgeCompanionV2Api.Application.Common.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,21 +18,29 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.CreateShopping
 
             RuleFor(x => x.MeasurementId)
                 .NotEmpty().WithMessage("Item must have a measurement.")
-                .MustAsync(ExistMeasurementType).WithMessage("Measurement type does not exist.");
+                .MustAsync(MeasurementTypeExists).WithMessage("Measurement type does not exist.");
             RuleFor(x => x.IngredientId)
-                .MustAsync(ExistIngredientType).WithMessage("Ingredient does not exist.");
+                .MustAsync(IngredientExists).WithMessage("Ingredient does not exist.");
+            RuleFor(x => new { x.IngredientId, x.UserId })
+                .MustAsync((command, properties, cancellationToken) => ItemNotExists(command.IngredientId, command.UserId, cancellationToken)).WithMessage("Ingredient already exists in your shopping list, please update ingredient instead.");
         }
 
-        private async Task<bool> ExistMeasurementType(int measurementId, CancellationToken cancellationToken)
+        private async Task<bool> MeasurementTypeExists(int measurementId, CancellationToken cancellationToken)
         {
             var measurementType = await _applicationDbContext.MeasurementTypes.FindAsync(measurementId);
             return measurementType is not null;
         }
 
-        private async Task<bool> ExistIngredientType(int ingredientId, CancellationToken cancellationToken)
+        private async Task<bool> IngredientExists(int ingredientId, CancellationToken cancellationToken)
         {
             var ingredient = await _applicationDbContext.Ingredients.FindAsync(ingredientId);
             return ingredient is not null;
+        }
+
+        private async Task<bool> ItemNotExists(int ingredientId, string userId, CancellationToken cancellationToken)
+        {
+            var ingredient = await _applicationDbContext.ShoppingListItem.Include(x => x.ShoppingList).FirstOrDefaultAsync(x => x.IngredientId == ingredientId && x.ShoppingList.UserId == userId && x.IsDeleted != true);
+            return ingredient is null;
         }
     }
 }

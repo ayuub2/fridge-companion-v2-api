@@ -7,6 +7,7 @@ using FridgeCompanionV2Api.Application.ShoppingItems.Commands.UpdateShoppingItem
 using FridgeCompanionV2Api.Application.ShoppingItems.Queries.GetShoppingItems;
 using FridgeCompanionV2Api.Application.ShoppingLists.Commands.CreateShoppingList;
 using FridgeCompanionV2Api.Application.ShoppingLists.Queries.GetShoppingList;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -71,7 +72,7 @@ namespace FridgeCompanionV2Api.Controllers
         }
 
         [HttpDelete("Item")]
-        public async Task<ActionResult<ShoppingItemDto>> DeleteItem(DeleteShoppingItemCommand command)
+        public async Task<ActionResult<Unit>> DeleteItem(DeleteShoppingItemCommand command)
         {
             command.UserId = _currentUserService.UserId;
             return await Mediator.Send(command);
