@@ -10,6 +10,8 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.CreateShopping
     public class CreateShoppingItemCommand : IRequest<ShoppingItemDto>
     {
         public string UserId { get; set; }
-        public string Name { get; set; }
+        public int IngredientId { get; set; }
+        public int MeasurementId { get; set; }
+        public decimal Amount { get; set; }
     }
 }

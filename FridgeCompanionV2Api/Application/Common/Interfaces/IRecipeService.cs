@@ -23,5 +23,6 @@ namespace FridgeCompanionV2Api.Application.Common.Interfaces
         List<RecipeDto> PopulateUserFavourites(List<UserFavouriteRecipes> favourites, List<RecipeDto> recipes);
         RecipeDto PopulateUserFavourites(List<UserFavouriteRecipes> favourites, RecipeDto recipe);
         RecipeDto GetRecipeInServingSize(int servingSize, RecipeDto recipe);
+        RecipeDto GetRecipeInServingSizeWithoutNutrition(int servingSize, RecipeDto recipe);
     }
 }

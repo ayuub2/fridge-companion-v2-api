@@ -32,6 +32,7 @@ namespace FridgeCompanionV2Api.Application.Common.Interfaces
         public DbSet<UserDiets> UserDiets { get; set; }
         public DbSet<Suggestion> Suggestions { get; set; }
         public DbSet<SuggestionRecipe> SuggestionsRecipes { get; set; }
+        public DbSet<ShoppingListRecipeItem> ShoppingListRecipeItem { get; set; }
         public DbSet<Stat> Stats { get; set; }
         DbContext Instance { get; }
 

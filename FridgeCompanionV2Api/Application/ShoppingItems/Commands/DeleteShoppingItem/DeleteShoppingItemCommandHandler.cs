@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.DeleteShoppingItem
 {
-    public class DeleteShoppingItemCommandHandler : IRequestHandler<DeleteShoppingItemCommand, ShoppingItemDto>
+    public class DeleteShoppingItemCommandHandler : IRequestHandler<DeleteShoppingItemCommand, Unit>
     {
         private readonly IApplicationDbContext _applicationDbContext;
         private readonly IMapper _mapper;
@@ -25,7 +25,7 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.DeleteShopping
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<ShoppingItemDto> Handle(DeleteShoppingItemCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(DeleteShoppingItemCommand request, CancellationToken cancellationToken)
         {
             if (request is null)
             {
@@ -43,7 +43,7 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.DeleteShopping
             item.IsDeleted = true;
 
             await _applicationDbContext.SaveChangesAsync(cancellationToken);
-            return _mapper.Map<ShoppingItemDto>(item);
+            return Unit.Value;
         }
     }
 }
