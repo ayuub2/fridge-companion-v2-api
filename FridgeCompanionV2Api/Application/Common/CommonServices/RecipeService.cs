@@ -162,6 +162,34 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
             return recipe;
         }
 
+         public RecipeDto GetRecipeInServingSizeWithoutNutrition(int servingSize, RecipeDto recipe) 
+        {
+            // The ingredient converter will be used to get one serving size of current recipe
+            decimal ingredientConverter = decimal.Divide(1, recipe.Servings);
+            recipe.Servings = servingSize;
+            foreach (var ingredient in recipe.Ingredients)
+            {
+                // Get ingredient amount for one serving size, then use that to get for serving size requested
+                var ingredientAmountForOneServing = ingredient.Amount * ingredientConverter;
+                var ingredientAmountForRequestingServing = ingredientAmountForOneServing * servingSize;
+
+                // if the amount falls below 1 then we convert to grams for better experience
+                if (ingredientAmountForRequestingServing < 1 && ingredient.Measurement.Name != "Grams") 
+                {
+                    var measurementType = _context.IngredientMeasurements.FirstOrDefault(x => x.MeasurementId == ingredient.Measurement.Id &&
+                                            x.IngredientId == ingredient.Ingredient.Id);
+                    var ingredientGrams = measurementType.AverageGrams != null ? measurementType.AverageGrams.Value * ingredient.Amount : Convert.ToDecimal(ingredient.Amount);
+                    ingredient.Amount = (int)ingredientGrams;
+                    ingredient.Measurement = _mapper.Map<MeasurementTypeDto>(_context.MeasurementTypes.FirstOrDefault(x => x.Name == "Grams"));
+                } else 
+                {
+                    ingredient.Amount = (int)ingredientAmountForRequestingServing;
+                }
+            }
+            return recipe;
+        }
+
+
         public List<RecipeDto> PopulateUserFavourites(List<UserFavouriteRecipes> favourites, List<RecipeDto> recipes)
         {
             recipes.ForEach(recipe => recipe.isFavourited = favourites.Any(x => x.RecipeId == recipe.Id));

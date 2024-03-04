@@ -9,5 +9,6 @@ namespace FridgeCompanionV2Api.Domain.Entities
         public string Name { get; set; }
         public string UserId { get; set; }
         public virtual IList<ShoppingListItem> Items { get; private set; } = new List<ShoppingListItem>();
+        public virtual IList<ShoppingListRecipeItem> Recipes { get; set; } = new List<ShoppingListRecipeItem>();
     }
 }

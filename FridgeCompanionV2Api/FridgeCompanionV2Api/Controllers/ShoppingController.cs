@@ -5,7 +5,11 @@ using FridgeCompanionV2Api.Application.ShoppingItems.Commands.DeleteAllShoppingI
 using FridgeCompanionV2Api.Application.ShoppingItems.Commands.DeleteShoppingItem;
 using FridgeCompanionV2Api.Application.ShoppingItems.Commands.UpdateShoppingItem;
 using FridgeCompanionV2Api.Application.ShoppingItems.Queries.GetShoppingItems;
+using FridgeCompanionV2Api.Application.ShoppingLists.Commands.ClearShoppingList;
 using FridgeCompanionV2Api.Application.ShoppingLists.Commands.CreateShoppingList;
+using FridgeCompanionV2Api.Application.ShoppingLists.Queries.GetShoppingList;
+using FridgeCompanionV2Api.Application.ShoppingRecipes.Commands.AddShoppingRecipe;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -39,10 +43,32 @@ namespace FridgeCompanionV2Api.Controllers
             return await Mediator.Send(command);
         }
 
+        [HttpGet("List")]
+        public async Task<ActionResult<ShoppingListDto>> GetList()
+        {
+            GetShoppingListQuery query = new GetShoppingListQuery();
+            query.UserId = _currentUserService.UserId;
+            return await Mediator.Send(query);
+        }
+
+        [HttpDelete("ListAll")]
+        public async Task<ActionResult<Unit>> DeleteListAll(ClearShoppingListCommand command)
+        {
+            command.UserId = _currentUserService.UserId;
+            return await Mediator.Send(command);
+        }
+
         [HttpGet("Item")]
         public async Task<ActionResult<List<ShoppingItemDto>>> GetItems()
         {
             GetShoppingItemsCommand command = new GetShoppingItemsCommand();
+            command.UserId = _currentUserService.UserId;
+            return await Mediator.Send(command);
+        }
+
+        [HttpPost("Recipe")]
+        public async Task<ActionResult<ShoppingListRecipeDto>> CreateRecipe(AddShoppingRecipeCommand command)
+        {
             command.UserId = _currentUserService.UserId;
             return await Mediator.Send(command);
         }
@@ -62,7 +88,7 @@ namespace FridgeCompanionV2Api.Controllers
         }
 
         [HttpDelete("Item")]
-        public async Task<ActionResult<ShoppingItemDto>> DeleteItem(DeleteShoppingItemCommand command)
+        public async Task<ActionResult<Unit>> DeleteItem(DeleteShoppingItemCommand command)
         {
             command.UserId = _currentUserService.UserId;
             return await Mediator.Send(command);

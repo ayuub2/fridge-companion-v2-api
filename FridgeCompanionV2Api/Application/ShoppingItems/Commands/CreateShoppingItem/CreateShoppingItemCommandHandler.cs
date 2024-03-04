@@ -31,7 +31,6 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.CreateShopping
                 throw new ArgumentNullException(nameof(request));
             }
 
-
             try
             {
                 var shoppingList = _applicationDbContext.ShoppingList.FirstOrDefault(x => x.UserId == request.UserId);
@@ -45,13 +44,16 @@ namespace FridgeCompanionV2Api.Application.ShoppingItems.Commands.CreateShopping
                     await _applicationDbContext.SaveChangesAsync(cancellationToken);
                 }
 
+                _logger.LogInformation("Adding shopping list item for user {UserId}", request.UserId);
+
                 var addedItem = _applicationDbContext.ShoppingListItem.Add(new Domain.Entities.ShoppingListItem() 
                 {
-                    Name = request.Name,
                     IsChecked = false,
                     IsDeleted = false,
-                    ShoppingList = shoppingList,
-                    ShoppingListId = shoppingList.Id
+                    ShoppingListId = shoppingList.Id,
+                    MeasurementId = request.MeasurementId,
+                    IngredientId = request.IngredientId,
+                    Amount = request.Amount
                 });
 
                 await _applicationDbContext.SaveChangesAsync(cancellationToken);

@@ -11,5 +11,9 @@ namespace FridgeCompanionV2Api.Application.Common.Models
         public string Name { get; set; }
         public bool IsChecked { get; set; }
         public bool IsDeleted { get; set; }
+        public int MeasurementId { get; set; }
+        public int IngredientId { get; set; }
+        public string Measurement { get; set; }
+        public decimal Amount { get; set; }
     }
 }
