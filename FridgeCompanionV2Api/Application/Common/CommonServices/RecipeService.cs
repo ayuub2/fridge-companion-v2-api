@@ -202,40 +202,6 @@ namespace FridgeCompanionV2Api.Application.Common.CommonServices
             return recipe;
         }
 
-        public List<RecipeDto> CalculateNutrition(List<RecipeDto> recipes)
-        {
-            foreach (var recipe in recipes)
-            {
-                // foreach ingredient in the recipe we convert the nutritional values are relevant to the serving size of the recipe
-                foreach (var ingredient in recipe.Ingredients)
-                {
-                    // we first convert the ingredient amount from any measurement type to grams. This will allow us to compare to the
-                    // ingredient standard which is in grams and is used to determine the nutritional values saved in the DB
-                    var ingredientGrams = _converterService.ConvertIngredientAmountToGrams(ingredient);
-                    var gramFactor = ingredientGrams / ingredient.Ingredient.Standard;
-                    var ingredientDto = ingredient.Ingredient;
-                    ingredientDto.Calories = decimal.ToInt32(ingredientDto.Calories * gramFactor);
-                    ingredientDto.Protein = ingredientDto.Protein * gramFactor;
-                    ingredientDto.Fat = ingredientDto.Fat * gramFactor;
-                    ingredientDto.Fibre = ingredientDto.Fibre * gramFactor;
-                    ingredientDto.Carb = ingredientDto.Carb * gramFactor;
-                    ingredientDto.Sugar = ingredientDto.Sugar * gramFactor;
-                }
-                var recipeInServingSize = GetRecipeInServingSize(recipe.Servings, recipe);
-
-                recipeInServingSize.Nutrition = new NutritionDto()
-                {
-                    Calories = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Calories),
-                    Protein = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Protein),
-                    Fat = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Fat),
-                    Fibre = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Fibre),
-                    Carb = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Carb),
-                    Sugar = recipeInServingSize.Ingredients.Sum(x => x.Ingredient.Sugar)
-                };
-            }
-            return recipes;
-        }
-
         public RecipeDto CalculateNutrition(int servingSize, RecipeDto recipe)
         {
             var recipeInServingSize = GetRecipeInServingSize(servingSize, recipe);
